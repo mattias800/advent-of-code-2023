@@ -22,7 +22,7 @@ export const part2 = (input: string) => {
     .map((ll) => parseInt(ll[0].value) * parseInt(ll[1].value))
     .reduce((sum, item) => sum + item, 0);
 
-  console.log("Part 1 solution: " + solution);
+  console.log("Part 2 solution: " + solution);
 };
 
 const decorateCharMatrixWithNeighbours = (

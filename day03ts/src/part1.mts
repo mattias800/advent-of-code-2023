@@ -36,12 +36,11 @@ const hasCharAt = (
   return charMatrix[lineNumber]?.[columnNumber] ?? false;
 };
 
-const getCharMatrix = function (lines: Array<string>): CharMatrix {
-  return lines.reduce((sum, item, lineNumber) => {
+const getCharMatrix = (lines: Array<string>): CharMatrix =>
+  lines.reduce((sum, item, lineNumber) => {
     sum[lineNumber] = getColumnsWithChar(item);
     return sum;
   }, {} as CharMatrix);
-};
 
 const getColumnsWithChar = (line: string): Record<number, boolean> =>
   line.split("").reduce(

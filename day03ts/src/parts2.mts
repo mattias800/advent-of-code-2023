@@ -38,9 +38,9 @@ const decorateCharMatrixWithNeighbours = (
   });
 };
 
-const getCharMatrixWithStars = function (
+const getCharMatrixWithStars = (
   lines: Array<string>,
-): CharMatrixWithNeighbours {
+): CharMatrixWithNeighbours => {
   return lines.reduce((sum, item, lineNumber) => {
     sum[lineNumber] = getColumnsWithStarChar(item);
     return sum;

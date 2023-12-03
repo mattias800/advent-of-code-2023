@@ -1,4 +1,9 @@
-import {CharMatrix, getNeighbours, getNumbersInLine, numbers} from "./common.mjs";
+import {
+  CharMatrix,
+  getNeighbours,
+  getNumbersInLine,
+  numbers,
+} from "./common.mjs";
 
 export const part1 = (input: string) => {
   const lines = input.split("\n").filter((p) => p);

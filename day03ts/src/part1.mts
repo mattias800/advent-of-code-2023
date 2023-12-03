@@ -1,36 +1,7 @@
-import fs from "fs";
-const numbers = "0123456789";
+import { CharMatrix, Coordinate, NumberInLine, numbers } from "./common.mjs";
 
-interface NumberInLine {
-  value: string;
-  start: number;
-}
-
-type CharMatrix = Record<number, Record<number, boolean>>;
-
-interface Coordinate {
-  column: number;
-  line: number;
-}
-
-const testinput =
-  "467..114..\n" +
-  "...*......\n" +
-  "..35..633.\n" +
-  "......#...\n" +
-  "617*......\n" +
-  ".....+.58.\n" +
-  "..592.....\n" +
-  "......755.\n" +
-  "...$.*....\n" +
-  ".664.598..";
-
-const part1 = () => {
-  const r = fs.readFileSync("./src/input.txt");
-  const lines = r
-    .toString()
-    .split("\n")
-    .filter((p) => p);
+export const part1 = (input: string) => {
+  const lines = input.split("\n").filter((p) => p);
 
   const charMatrix = getCharMatrix(lines);
 
@@ -127,5 +98,3 @@ const getColumnsWithChar = (line: string): Record<number, boolean> =>
     },
     {} as Record<number, boolean>,
   );
-
-part1();

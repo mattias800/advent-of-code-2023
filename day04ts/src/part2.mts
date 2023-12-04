@@ -37,6 +37,6 @@ const getNumWonCards = (
   );
 
   return wonCardNumbers.reduce((sum, item) => {
-    return sum + 1 + getNumWonCards(winningNumbersByLines, item);
-  }, 0);
+    return sum + getNumWonCards(winningNumbersByLines, item);
+  }, winningNumbers.length);
 };

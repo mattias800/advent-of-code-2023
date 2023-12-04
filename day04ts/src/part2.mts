@@ -7,9 +7,8 @@ export const part2 = (input: string) => {
   const lines = input
     .split("\n")
     .map((p) => p.trim())
-    .filter((p) => p);
-
-  console.log("Part 2 is slow, might take a minute..");
+    .filter((p) => p)
+    .map((cardLine) => getWinningNumbersFromCard(cardLine));
 
   const solution = lines.reduce((sum, _, lineNumber) => {
     return sum + 1 + getNumWonCards(lines, lineNumber);
@@ -18,22 +17,26 @@ export const part2 = (input: string) => {
   console.log("Part 2 solution: " + solution);
 };
 
-const getNumWonCards = (lines: Array<string>, lineNumber: number): number => {
-  if (lineNumber >= lines.length) {
+const getNumWonCards = (
+  winningNumbersByLines: Array<Array<number>>,
+  lineNumber: number,
+): number => {
+  if (lineNumber >= winningNumbersByLines.length) {
     return 0;
   }
 
-  const cardLine = lines[lineNumber];
+  const winningNumbers = winningNumbersByLines[lineNumber];
 
-  const numWins = getWinningNumbersFromCard(cardLine).length;
-
-  if (numWins === 0) {
+  if (winningNumbers.length === 0) {
     return 0;
   }
 
-  const wonCardNumbers = range(lineNumber + 1, lineNumber + 1 + numWins);
+  const wonCardNumbers = range(
+    lineNumber + 1,
+    lineNumber + 1 + winningNumbers.length,
+  );
 
   return wonCardNumbers.reduce((sum, item) => {
-    return sum + 1 + getNumWonCards(lines, item);
+    return sum + 1 + getNumWonCards(winningNumbersByLines, item);
   }, 0);
 };

@@ -22,7 +22,7 @@ const decorateCharMatrixWithNeighbours = (charMatrix, numberInLine, lineNumber) 
         }
     });
 };
-const getCharMatrixWithStars = function (lines) {
+const getCharMatrixWithStars = (lines) => {
     return lines.reduce((sum, item, lineNumber) => {
         sum[lineNumber] = getColumnsWithStarChar(item);
         return sum;

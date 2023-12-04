@@ -15,12 +15,10 @@ const hasCharAt = (lineNumber, columnNumber, charMatrix) => {
     }
     return charMatrix[lineNumber]?.[columnNumber] ?? false;
 };
-const getCharMatrix = function (lines) {
-    return lines.reduce((sum, item, lineNumber) => {
-        sum[lineNumber] = getColumnsWithChar(item);
-        return sum;
-    }, {});
-};
+const getCharMatrix = (lines) => lines.reduce((sum, item, lineNumber) => {
+    sum[lineNumber] = getColumnsWithChar(item);
+    return sum;
+}, {});
 const getColumnsWithChar = (line) => line.split("").reduce((sum, char, index) => {
     if (numbers.indexOf(char) < 0 && char !== ".") {
         sum[index] = true;

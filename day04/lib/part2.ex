@@ -3,38 +3,38 @@ defmodule Day04Part2 do
     lines =
       input
       |> String.split("\n", trim: true)
-      |> Enum.map(&Day04Common.getWinningNumbersFromCard/1)
+      |> Enum.map(&Day04Common.get_winning_numbers_from_card/1)
 
     solution =
       lines
       |> Enum.with_index()
       |> Enum.reduce(0, fn {_, lineNumber}, sum ->
-        sum + 1 + getNumWonCards(lines, lineNumber)
+        sum + 1 + get_num_won_cards(lines, lineNumber)
       end)
       |> Integer.to_string()
 
     IO.puts("Part 2 solution: " <> solution)
   end
 
-  def getNumWonCards(winningNumbersByLines, lineNumber) do
+  def get_num_won_cards(winning_numbers_by_lines, line_number) do
     cond do
-      lineNumber >= length(winningNumbersByLines) ->
+      line_number >= length(winning_numbers_by_lines) ->
         0
 
       true ->
-        winningNumbers = Enum.at(winningNumbersByLines, lineNumber)
+        winning_numbers = Enum.at(winning_numbers_by_lines, line_number)
 
         cond do
-          length(winningNumbers) === 0 ->
+          length(winning_numbers) === 0 ->
             0
 
           true ->
-            low = lineNumber + 1
-            high = lineNumber + length(winningNumbers)
+            low = line_number + 1
+            high = line_number + length(winning_numbers)
             wonCardNumbers = Enum.to_list(low..high)
 
-            Enum.reduce(wonCardNumbers, length(winningNumbers), fn item, sum ->
-              sum + getNumWonCards(winningNumbersByLines, item)
+            Enum.reduce(wonCardNumbers, length(winning_numbers), fn item, sum ->
+              sum + get_num_won_cards(winning_numbers_by_lines, item)
             end)
         end
     end

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "yarn tsc; node dist/main.mjs",
+    "dev": "yarn tsc; node --max-old-space-size=8192 dist/main.mjs",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prettier": "prettier --no-config --write \"./src/**/*.{mts,tsx,css,graphql}\""
   },

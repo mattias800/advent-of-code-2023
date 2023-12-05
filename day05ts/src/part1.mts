@@ -1,10 +1,14 @@
-import { readSeedMaps, resolveLocationForSeed } from "./common.mjs";
+import {
+  createSeedMapsBySource,
+  readSeedMaps,
+  resolveLocationForSeed,
+} from "./common.mjs";
 
 export const part1 = (input: string) => {
   const { seedMaps, seeds } = readSeedMaps(input);
 
   const allLocations = seeds.map((seed) =>
-    resolveLocationForSeed(seed, "seed", seedMaps),
+    resolveLocationForSeed(seed, "seed", createSeedMapsBySource(seedMaps)),
   );
   const solution = Math.min(...allLocations);
 

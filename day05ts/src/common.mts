@@ -26,6 +26,18 @@ export const readSeedMaps = (
   };
 };
 
+export const createSeedMapsBySource = (
+  seedMaps: Array<SeedMap>,
+): Record<string, SeedMap> => {
+  return seedMaps.reduce(
+    (sum, item) => {
+      sum[item.source] = item;
+      return sum;
+    },
+    {} as Record<string, SeedMap>,
+  );
+};
+
 // "seeds: 79 14 55 13"
 const createSeeds = (input: string): Array<number> => {
   return input
@@ -48,17 +60,6 @@ const createSeedMap = (input: string): SeedMap => {
     }));
 
   return { source, destination, offsets };
-};
-
-export const getMapBySource = (
-  sourceName: string,
-  seedMaps: Array<SeedMap>,
-): SeedMap => {
-  const r = seedMaps.find((s) => s.source === sourceName);
-  if (r == null) {
-    throw new Error("SeedMap not found.");
-  }
-  return r;
 };
 
 export const resolveValueForMap = (
@@ -91,9 +92,9 @@ const resolveValueForMapOffset = (
 export const resolveLocationForSeed = (
   value: number,
   sourceName: string,
-  seedMaps: Array<SeedMap>,
+  seedMaps: Record<string, SeedMap>,
 ): number => {
-  const map = getMapBySource(sourceName, seedMaps);
+  const map = seedMaps[sourceName];
   const next = resolveValueForMap(value, map.offsets);
   const nextSource = map.destination;
   if (nextSource === "location") {

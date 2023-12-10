@@ -22,9 +22,6 @@ describe("part1", () => {
   });
 
   describe("byHandStrength", () => {
-    it("singles", () => {
-      expect(["3", "2", "4"].sort(byHandStrength)).toEqual(["4", "3", "2"]);
-    });
     it("works", () => {
       expect(["33332", "2AAAA"].sort(byHandStrength)).toEqual([
         "33332",
@@ -52,6 +49,9 @@ describe("part1", () => {
 
   describe("byHandPrecedence", () => {
     describe("when first character is different", () => {
+      it("singles", () => {
+        expect(["3", "2", "4"].sort(byHandPrecedence)).toEqual(["4", "3", "2"]);
+      });
       it("works", () => {
         expect(
           ["23456", "56789", "34567", "45678"].sort(byHandPrecedence),

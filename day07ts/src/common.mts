@@ -1,9 +1,19 @@
 export const strengthOrder = "x23456789TJQKA";
+export const strengthOrderWithJoker = "J23456789TQKA";
 
 export interface HandBid {
   hand: string;
   bid: number;
 }
+
+const findFirstNonJoker = (hand: string): string => {
+  for (let i = 1; i < hand.length; i++) {
+    if (hand[i] !== "J") {
+      return hand[i];
+    }
+  }
+  throw new Error("Only jokers in hand.");
+};
 
 export const getFiveOfAKind = (hand: string): number => {
   for (let i = 1; i < hand.length; i++) {

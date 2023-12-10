@@ -1,4 +1,9 @@
-const strengthOrder = "23456789TJQKA";
+export const strengthOrder = "x23456789TJQKA";
+
+export interface HandBid {
+  hand: string;
+  bid: number;
+}
 
 export const getFiveOfAKind = (hand: string): number => {
   for (let i = 1; i < hand.length; i++) {
@@ -57,7 +62,9 @@ export const getFullHouse = (hand: string): number => {
   if (twos == null) {
     return 0;
   }
-  return strengthOrder.indexOf(threes) + strengthOrder.indexOf(twos);
+  return hand
+    .split("")
+    .reduce((sum, item) => sum + strengthOrder.indexOf(item), 0);
 };
 
 export const getTwoPair = (hand: string): number => {
@@ -66,7 +73,7 @@ export const getTwoPair = (hand: string): number => {
     return 0;
   }
   const secondPair = findNumOfAKind(hand, 2, firstPair);
-  if (secondPair !== null) {
+  if (secondPair == null) {
     return 0;
   }
   return strengthOrder.indexOf(firstPair) + strengthOrder.indexOf(secondPair);
@@ -90,37 +97,48 @@ export const getPair = (hand: string): number => {
   return 0;
 };
 
-export const getHandStrength = (hand: string): number => {
+export const getHandStrength = (
+  hand: string,
+): { strength: number; type: string } => {
   const fiveOfAKind = getFiveOfAKind(hand);
   if (fiveOfAKind) {
-    return 700 + fiveOfAKind;
+    return { strength: 700 + fiveOfAKind, type: "fiveOfAKind" };
   }
   const fourOfAKind = getFourOfAKind(hand);
   if (fourOfAKind) {
-    return 600 + fourOfAKind;
+    return { strength: 600 + fourOfAKind, type: "fourOfAKind" };
   }
   const fullHouse = getFullHouse(hand);
   if (fullHouse) {
-    return 500 + fullHouse;
+    return { strength: 500 + fullHouse, type: "fullHouse" };
   }
   const threeOfAKind = getThreeOfAKind(hand);
   if (threeOfAKind) {
-    return 400 + threeOfAKind;
+    return { strength: 400 + threeOfAKind, type: "threeOfAKind" };
   }
   const twoPair = getTwoPair(hand);
   if (twoPair) {
-    return 200 + twoPair;
+    return { strength: 200 + twoPair, type: "twoPair" };
   }
   const pair = getPair(hand);
   if (pair) {
-    return 100 + pair;
+    return { strength: 100 + pair, type: "pair" };
   }
 
-  return 0;
+  return { strength: 0, type: "none" };
 };
 
 export const byStrength = (a: string, b: string): number =>
-  getHandStrength(b) - getHandStrength(a);
+  getHandStrength(b).strength - getHandStrength(a).strength;
 
-export const byStrengthFullRow = (a: string, b: string): number =>
-  getHandStrength(b.split(" ")[0]) - getHandStrength(a.split(" ")[0]);
+export const byHandBidStrengthWeakFirst = (a: HandBid, b: HandBid): number =>
+  getHandStrength(a.hand).strength - getHandStrength(b.hand).strength;
+
+export const fromRowToHandBid = (row: string): HandBid => {
+  const [hand, bidString] = row.split(" ");
+  const bid = parseInt(bidString);
+  return {
+    hand,
+    bid,
+  };
+};

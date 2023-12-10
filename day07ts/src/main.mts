@@ -8,5 +8,8 @@ export const testinput =
 const r = fs.readFileSync("./src/input.txt");
 const input = r.toString();
 
+// 252310510 is too high
+// 250751652 is too high
+part1(input);
 part1(testinput);
-part2(input);
+part2(testinput);

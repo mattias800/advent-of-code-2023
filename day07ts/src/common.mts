@@ -1,18 +1,32 @@
 export const strengthOrder = "x23456789TJQKA";
 export const strengthOrderWithJoker = "J23456789TQKA";
+export const strengthOrderWithJokerStrongFirst = "AKQT98765432J";
 
 export interface HandBid {
   hand: string;
   bid: number;
 }
 
-const findFirstNonJoker = (hand: string): string => {
+export const findFirstNonJoker = (hand: string): string => {
   for (let i = 1; i < hand.length; i++) {
     if (hand[i] !== "J") {
       return hand[i];
     }
   }
   throw new Error("Only jokers in hand.");
+};
+
+export const getNumJokers = (hand: string): number =>
+  getNumCardsOfKind(hand, "J");
+
+export const getNumCardsOfKind = (hand: string, kind: string): number => {
+  let num = 0;
+  for (let i = 1; i < hand.length; i++) {
+    if (hand[i] !== kind) {
+      num++;
+    }
+  }
+  return num;
 };
 
 export const getFiveOfAKind = (hand: string): number => {

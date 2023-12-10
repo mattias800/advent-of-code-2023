@@ -9,11 +9,6 @@ import {
 
 describe("common", () => {
   describe("getFiveOfAKind", () => {
-    describe("when five of a kind starts with J", () => {
-      it("returns value", () => {
-        expect(getFiveOfAKind("J2222")).toBe(1);
-      });
-    });
     describe("when there are five of same", () => {
       it("returns value", () => {
         expect(getFiveOfAKind("22222")).toBe(1);

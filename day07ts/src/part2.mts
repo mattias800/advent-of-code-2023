@@ -1,5 +1,5 @@
 import {
-  byHandBidStrength,
+  byHandPrecedence,
   fromRowToHandBid,
   getHandStrength,
   getMostCommonCard,
@@ -14,11 +14,16 @@ export const part2 = (input: string) => {
   console.log("Part 2 solution: " + solution);
 };
 
+interface HandBidDecorated extends HandBid {
+  handNoJokers: string;
+}
+
 export const getSolution = (input: string): number => {
   const lines = input.split("\n").filter((p) => p);
 
-  const handBids = lines.map(fromRowToHandBid).map<HandBid>((h) => ({
-    hand: replaceJoker(h.hand),
+  const handBids = lines.map(fromRowToHandBid).map<HandBidDecorated>((h) => ({
+    handNoJokers: replaceJoker(h.hand),
+    hand: h.hand,
     bid: h.bid,
   }));
 
@@ -28,8 +33,10 @@ export const getSolution = (input: string): number => {
   const withRank = handBids.map((h, i) => ({
     ...h,
     rank: i + 1,
-    strength: getHandStrength(h.hand, strengthOrder),
+    strength: getHandStrength(h.handNoJokers, strengthOrder),
   }));
+
+  console.log(withRank.filter(j => j.hand.indexOf("J") >= 0));
 
   const values = withRank.map((w) => w.bid * w.rank);
   return values.reduce((sum, item) => sum + item, 0);
@@ -39,3 +46,15 @@ const replaceJoker = (hand: string): string => {
   const mostCommonCard = getMostCommonCard(hand);
   return hand.replaceAll("J", mostCommonCard);
 };
+
+export const byHandBidStrength =
+  (strengthOrder: string) =>
+  (a: HandBidDecorated, b: HandBidDecorated): number => {
+    const r =
+      getHandStrength(b.handNoJokers, strengthOrder).strength -
+      getHandStrength(a.handNoJokers, strengthOrder).strength;
+    if (r === 0) {
+      return byHandPrecedence(strengthOrder)(a.hand, b.hand);
+    }
+    return r;
+  };

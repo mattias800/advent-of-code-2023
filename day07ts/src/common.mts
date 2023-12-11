@@ -14,7 +14,10 @@ export const getMostCommonCard = (hand: string): string => {
 
   const cards = Object.keys(numCardsPerType);
 
-  return cards.reduce((sum, card) => {
+  const r = cards.reduce<string | undefined>((sum, card) => {
+    if (card === "J") {
+      return sum;
+    }
     if (sum == null) {
       return card;
     }
@@ -22,29 +25,9 @@ export const getMostCommonCard = (hand: string): string => {
       return card;
     }
     return sum;
-  }, cards[0]);
-};
+  }, undefined);
 
-export const findFirstNonJoker = (hand: string): string => {
-  for (let i = 1; i < hand.length; i++) {
-    if (hand[i] !== "J") {
-      return hand[i];
-    }
-  }
-  throw new Error("Only jokers in hand.");
-};
-
-export const getNumJokers = (hand: string): number =>
-  getNumCardsOfKind(hand, "J");
-
-export const getNumCardsOfKind = (hand: string, kind: string): number => {
-  let num = 0;
-  for (let i = 1; i < hand.length; i++) {
-    if (hand[i] !== kind) {
-      num++;
-    }
-  }
-  return num;
+  return r == null ? "K" : r;
 };
 
 export const getFiveOfAKind = (hand: string, strengthOrder: string): number => {

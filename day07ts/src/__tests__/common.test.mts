@@ -1,4 +1,6 @@
 import {
+  byHandPrecedence,
+  byHandStrength,
   getFiveOfAKind,
   getFourOfAKind,
   getFullHouse,
@@ -112,6 +114,21 @@ describe("common", () => {
     });
   });
   describe("getMostCommonCard", () => {
+    describe("when it starts with joker", () => {
+      it("returns not joker", () => {
+        expect(getMostCommonCard("J2345")).toBe("2");
+      });
+    });
+    describe("when joker is most common", () => {
+      it("returns not joker", () => {
+        expect(getMostCommonCard("JJJ22")).toBe("2");
+      });
+    });
+    describe("when it is only jokers", () => {
+      it("returns k", () => {
+        expect(getMostCommonCard("JJJJJ")).toBe("K");
+      });
+    });
     describe("when there are five of same", () => {
       it("returns value", () => {
         expect(getMostCommonCard("22233")).toBe("2");
@@ -125,6 +142,64 @@ describe("common", () => {
       it("returns 0", () => {
         expect(getMostCommonCard("45678")).toBe("4");
         expect(getMostCommonCard("44255")).toBe("4");
+      });
+    });
+  });
+
+  describe("byHandStrength", () => {
+    const comparator = byHandStrength(strengthOrder);
+    it("works once", () => {
+      expect(["33332", "2AAAA"].sort(comparator)).toEqual(["33332", "2AAAA"]);
+    });
+    it("works twice", () => {
+      expect(["77888", "77788"].sort(comparator)).toEqual(["77888", "77788"]);
+    });
+    it("works with two pairs", () => {
+      expect(["KK677", "KTJJT"].sort(comparator)).toEqual(["KK677", "KTJJT"]);
+    });
+    it("works with second two pairs", () => {
+      expect(["T55J5", "QQQJA"].sort(comparator)).toEqual(["QQQJA", "T55J5"]);
+    });
+  });
+
+  describe("byHandPrecedence", () => {
+    describe("when first character is different", () => {
+      it("singles", () => {
+        expect(["3", "2", "4"].sort(byHandPrecedence(strengthOrder))).toEqual([
+          "4",
+          "3",
+          "2",
+        ]);
+      });
+      it("works", () => {
+        expect(
+          ["23456", "56789", "34567", "45678"].sort(
+            byHandPrecedence(strengthOrder),
+          ),
+        ).toEqual(["56789", "45678", "34567", "23456"]);
+      });
+    });
+    describe("when first character is same", () => {
+      it("works with previous example", () => {
+        expect(
+          ["33332", "2AAAA"].sort(byHandPrecedence(strengthOrder)),
+        ).toEqual(["33332", "2AAAA"]);
+      });
+      it("sorts by second character", () => {
+        expect(
+          ["23456", "26789", "34567", "25678"].sort(
+            byHandPrecedence(strengthOrder),
+          ),
+        ).toEqual(["34567", "26789", "25678", "23456"]);
+      });
+    });
+    describe("when first and second character is same", () => {
+      it("sorts by third character", () => {
+        expect(
+          ["22456", "22789", "34567", "22678"].sort(
+            byHandPrecedence(strengthOrder),
+          ),
+        ).toEqual(["34567", "22789", "22678", "22456"]);
       });
     });
   });

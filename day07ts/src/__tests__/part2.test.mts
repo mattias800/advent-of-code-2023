@@ -16,7 +16,7 @@ describe("part2", () => {
     });
     it("works with input", () => {
       expect(getSolution(fs.readFileSync("./src/input.txt").toString())).toBe(
-        251012254,
+        249776650,
       );
     });
   });

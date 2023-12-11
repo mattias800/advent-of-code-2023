@@ -229,7 +229,7 @@ export const findTotalLength = (
     pos = nextPosition;
   }
 
-  throw new Error("Could not find length in 100 steps.");
+  throw new Error("Could not find length in 100000 steps.");
 };
 
 export const getTileDirections = (tile: Tile): [Direction, Direction] => {

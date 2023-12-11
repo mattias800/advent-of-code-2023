@@ -1,7 +1,7 @@
 import { getSolution } from "../part1.mts";
 import fs from "fs";
 
-describe("Day 09", () => {
+describe("Day 10", () => {
   describe("Part 1", () => {
     describe("getSolution", () => {
       it("works with test data", () => {

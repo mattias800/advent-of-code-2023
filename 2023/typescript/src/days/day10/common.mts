@@ -8,6 +8,8 @@ export type SouthWest = "7";
 export type SouthEast = "F";
 export type Ground = ".";
 export type Start = "S";
+export type Inside = "I";
+export type Outside = "O";
 
 export type Direction = "north" | "south" | "east" | "west";
 
@@ -32,6 +34,19 @@ export interface TileMap {
   rows: Array<TileRow>;
 }
 
+export type Trail = "empty" | "loop" | "inside" | "outside";
+
+export interface TrailTileMap {
+  rows: Array<TrailTileRow>;
+}
+
+export type TrailTileRow = Array<Trail>;
+
+export const createTrailTileMap = (tileMap: TileMap): TrailTileMap => {
+  return {
+    rows: tileMap.rows.map<TrailTileRow>((r) => r.map(() => "empty")),
+  };
+};
 export const getOppositeDirection = (direction: Direction): Direction => {
   switch (direction) {
     case "east":
@@ -144,7 +159,7 @@ export const getNextPossibleDirection = (
   throw new Error("Cannot get direction for tile: " + tile);
 };
 
-const getSurroundingPositions = (
+export const getSurroundingPositions = (
   position: Position,
 ): Array<{ position: Position; direction: Direction }> => {
   return [
@@ -170,6 +185,7 @@ export const findStartDirections = (tileMap: TileMap): Array<Direction> => {
   const startPosition = findStart(tileMap);
   const surrounding = getSurroundingPositions(startPosition);
   return surrounding
+    .filter(({ position }) => position.row >= 0 && position.column >= 0)
     .filter(({ position, direction }) => {
       const oppositeDirection = getOppositeDirection(direction);
       const tile = getTileAtPosition(tileMap, position);
@@ -186,12 +202,16 @@ export const findTotalLength = (
   currentPosition: Position,
   nextDirection: Direction,
   tileMap: TileMap,
+  trailTileMap?: TrailTileMap,
 ): number => {
   let pos = currentPosition;
   let dir = nextDirection;
   let counter = 0;
 
-  console.log("LETS GO");
+  if (trailTileMap) {
+    trailTileMap.rows[pos.row][pos.column] = "loop";
+  }
+
   for (let i = 0; i < 100000; i++) {
     counter++;
     const oppositeDirection = getOppositeDirection(dir);
@@ -200,7 +220,10 @@ export const findTotalLength = (
     if (nextTile === "S") {
       return counter;
     }
-    console.log("nextTile: " + nextTile);
+    if (trailTileMap) {
+      trailTileMap.rows[nextPosition.row][nextPosition.column] = "loop";
+    }
+
     const [possibleDir1, possibleDir2] = getTileDirections(nextTile);
     dir = possibleDir1 === oppositeDirection ? possibleDir2 : possibleDir1;
     pos = nextPosition;
@@ -255,4 +278,35 @@ export const goFromPosition = (
     case "south":
       return { row: position.row + 1, column: position.column };
   }
+};
+
+export const replaceStartWithTile = (tileMap: TileMap): TileMap => {
+  const pos = findStart(tileMap);
+  const [dir1, dir2] = findStartDirections(tileMap);
+  tileMap.rows[pos.row][pos.column] = getTileByDirections([dir1, dir2]);
+  return tileMap;
+};
+
+export const getTileByDirections = (
+  directions: [Direction, Direction],
+): Tile => {
+  if (directions.indexOf("north") >= 0 && directions.indexOf("east") >= 0) {
+    return "L";
+  }
+  if (directions.indexOf("south") >= 0 && directions.indexOf("east") >= 0) {
+    return "F";
+  }
+  if (directions.indexOf("south") >= 0 && directions.indexOf("west") >= 0) {
+    return "7";
+  }
+  if (directions.indexOf("north") >= 0 && directions.indexOf("west") >= 0) {
+    return "J";
+  }
+  if (directions.indexOf("east") >= 0 && directions.indexOf("west") >= 0) {
+    return "-";
+  }
+  if (directions.indexOf("north") >= 0 && directions.indexOf("south") >= 0) {
+    return "|";
+  }
+  throw new Error("Directions to not match any possible tile.");
 };

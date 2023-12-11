@@ -2,6 +2,7 @@ import {
   getFiveOfAKind,
   getFourOfAKind,
   getFullHouse,
+  getMostCommonCard,
   getPair,
   getThreeOfAKind,
   getTwoPair,
@@ -107,6 +108,23 @@ describe("common", () => {
       it("returns 0", () => {
         expect(getFullHouse("45678", strengthOrder)).toBe(0);
         expect(getFullHouse("44255", strengthOrder)).toBe(0);
+      });
+    });
+  });
+  describe("getMostCommonCard", () => {
+    describe("when there are five of same", () => {
+      it("returns value", () => {
+        expect(getMostCommonCard("22233")).toBe("2");
+        expect(getMostCommonCard("22333")).toBe("3");
+        expect(getMostCommonCard("AAAKK")).toBe("A");
+        expect(getMostCommonCard("AAAQQ")).toBe("A");
+        expect(getMostCommonCard("AAQQQ")).toBe("Q");
+      });
+    });
+    describe("when there are NOT five of same", () => {
+      it("returns 0", () => {
+        expect(getMostCommonCard("45678")).toBe("4");
+        expect(getMostCommonCard("44255")).toBe("4");
       });
     });
   });

@@ -9,4 +9,3 @@ const input = r.toString();
 
 part1(input);
 part2(input);
-

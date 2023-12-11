@@ -13,6 +13,8 @@
     "prettier": "prettier --no-config --write \"./src/**/*.{mts,tsx,css,graphql}\""
   },
   "dependencies": {
+    "@types/lodash": "^4.14.202",
+    "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -23,6 +25,8 @@
     "@typescript-eslint/eslint-plugin": "^6.10.0",
     "@typescript-eslint/parser": "^6.10.0",
     "@vitejs/plugin-react": "^4.2.0",
+    "@vitest/runner": "^1.0.4",
+    "@vitest/snapshot": "^1.0.4",
     "eslint": "^8.53.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.4",

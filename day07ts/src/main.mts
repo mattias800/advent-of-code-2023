@@ -11,4 +11,4 @@ const input = r.toString();
 // 252310510 is too high
 // 250751652 is too high
 part1(input);
-part2(testinput);
+part2(input);

@@ -1,11 +1,23 @@
-import { getFiveOfAKind } from "../common.mjs";
+import { getSolution } from "../part2.mjs";
+import fs from "fs";
 
 describe("part2", () => {
-  describe("getFiveOfAKind", () => {
-    describe("when five of a kind starts with J", () => {
-      it("returns value", () => {
-        expect(getFiveOfAKind("J2222")).toBe(1);
-      });
+  describe("getSolution", () => {
+    it("works with test data", () => {
+      expect(
+        getSolution(
+          "32T3K 765\n" +
+            "T55J5 684\n" +
+            "KK677 28\n" +
+            "KTJJT 220\n" +
+            "QQQJA 483",
+        ),
+      ).toBe(5905);
+    });
+    it("works with input", () => {
+      expect(getSolution(fs.readFileSync("./src/input.txt").toString())).toBe(
+        251012254,
+      );
     });
   });
 });

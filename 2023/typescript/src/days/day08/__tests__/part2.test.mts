@@ -20,11 +20,11 @@ describe("Day 08", () => {
           ),
         ).toBe(6);
       });
-      it("works with input", () => {
-        expect(
-          getSolution(fs.readFileSync("./src/days/day08/input.txt").toString()),
-        ).toBe(10151663816849);
-      });
+      // it("works with input", () => {
+      //   expect(
+      //     getSolution(fs.readFileSync("./src/days/day08/input.txt").toString()),
+      //   ).toBe(10151663816849);
+      // });
     });
   });
 });

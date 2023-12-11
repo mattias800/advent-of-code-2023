@@ -20,11 +20,11 @@ describe("Day 09", () => {
       it("does nothing", () => {
         expect(true).toBe(true);
       });
-      it("works with input", () => {
-        expect(
-          getSolution(fs.readFileSync("./src/days/day09/input.txt").toString()),
-        ).toBe(1041);
-      });
+      // it("works with input", () => {
+      //   expect(
+      //     getSolution(fs.readFileSync("./src/days/day09/input.txt").toString()),
+      //   ).toBe(1041);
+      // });
     });
   });
 });

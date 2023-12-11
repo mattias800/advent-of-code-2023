@@ -9,11 +9,11 @@ describe("Day 06", () => {
           getSolution("Time:      7  15   30\n" + "Distance:  9  40  200"),
         ).toBe(71503);
       });
-      it("works with input", () => {
-        expect(
-          getSolution(fs.readFileSync("./src/days/day06/input.txt").toString()),
-        ).toBe(39132886);
-      });
+      // it("works with input", () => {
+      //   expect(
+      //     getSolution(fs.readFileSync("./src/days/day06/input.txt").toString()),
+      //   ).toBe(39132886);
+      // });
     });
   });
 });

@@ -50,9 +50,9 @@ export const getNumCombinations = (
   for (let i = 0; i < pattern.length; i++) {
     const subpattern = pattern.substring(i, i + group);
 
+    const tailPattern = pattern.substring(subpattern.length);
+    numCombinations += getNumCombinations(tailPattern, groups, depth + 1);
     if (canContainGroup(subpattern)) {
-      const tailPattern = pattern.substring(subpattern.length);
-
       numCombinations += getNumCombinations(
         tailPattern,
         tail(groups),

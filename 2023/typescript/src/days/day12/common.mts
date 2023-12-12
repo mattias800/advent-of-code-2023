@@ -25,8 +25,6 @@ export const parseLine = (line: string): Doc => {
 export const getNumCombinations = (pattern: string, groups: Array<number>) =>
   traverseCombinations(pattern, groups, false, 0);
 
-const cache: Record<string, Record<string, number>> = {};
-
 /**
  * This is not my solution, it was taken from Youtube.
  * I used it to provide more expected values for unit test.
@@ -35,15 +33,22 @@ const cache: Record<string, Record<string, number>> = {};
  * @param groups
  */
 export const count = (pattern: string, groups: Array<number>): number => {
+  return countTraverse(pattern, groups, 0);
+};
+export const countTraverse = (
+  pattern: string,
+  groups: Array<number>,
+  groupsIndex: number,
+): number => {
   if (pattern === "") {
-    if (groups.length === 0) {
+    if (groupsIndex >= groups.length) {
       return 1;
     } else {
       return 0;
     }
   }
 
-  if (groups.length === 0) {
+  if (groupsIndex >= groups.length) {
     if (pattern.indexOf("#") >= 0) {
       return 0;
     } else {
@@ -51,30 +56,26 @@ export const count = (pattern: string, groups: Array<number>): number => {
     }
   }
 
-  const groupsKey = groups.toString();
-
-  if (cache[pattern]?.[groupsKey]) {
-    return cache[pattern]?.[groupsKey];
-  }
-
   let result = 0;
 
   if (".?".indexOf(pattern.charAt(0)) >= 0) {
-    result += count(pattern.substring(1), groups);
+    result += countTraverse(pattern.substring(1), groups, groupsIndex);
   }
   if ("#?".indexOf(pattern.charAt(0)) >= 0) {
     if (
-      groups[0] <= pattern.length &&
-      pattern.substring(0, groups[0]).indexOf(".") < 0 &&
-      (groups[0] === pattern.length || pattern[groups[0]] !== "#")
+      groups[groupsIndex] <= pattern.length &&
+      pattern.substring(0, groups[groupsIndex]).indexOf(".") < 0 &&
+      (groups[groupsIndex] === pattern.length ||
+        pattern[groups[groupsIndex]] !== "#")
     ) {
-      const [, ...tail] = groups;
-      result += count(pattern.substring(groups[0] + 1), tail);
+      result += countTraverse(
+        pattern.substring(groups[groupsIndex] + 1),
+        groups,
+        groupsIndex + 1,
+      );
     }
   }
 
-  cache[pattern] = cache[pattern] || {};
-  cache[pattern][groupsKey] = result;
   return result;
 };
 

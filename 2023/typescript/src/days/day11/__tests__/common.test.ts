@@ -2,7 +2,7 @@ import {
   getDistance,
   parseGalaxyMap,
   totalDistanceBetweenAll,
-} from "../common.mjs";
+} from "../common.mts";
 
 describe("Day 11", () => {
   const testInput =

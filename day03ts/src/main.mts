@@ -1,6 +1,6 @@
 import fs from "fs";
-import { part1 } from "./part1.mjs";
-import { part2 } from "./part2.mjs";
+import { part1 } from "./part1.mts";
+import { part2 } from "./part2.mts";
 
 export const testinput =
   "467..114..\n" +

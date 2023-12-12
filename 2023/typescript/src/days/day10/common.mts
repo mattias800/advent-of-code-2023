@@ -1,4 +1,4 @@
-import { exhaustSwitchCaseElseThrow } from "../../common/util/case/ExhaustiveSwitch.mjs";
+import { exhaustSwitchCaseElseThrow } from "../../common/util/case/ExhaustiveSwitch.mts";
 
 export type NorthSouth = "|";
 export type EastWest = "-";

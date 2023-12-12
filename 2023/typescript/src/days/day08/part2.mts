@@ -3,7 +3,7 @@ import {
   NodeByName,
   traverse,
   traverseEndingZ,
-} from "./common.mjs";
+} from "./common.mts";
 
 export const part2 = (input: string) => {
   const solution = getSolution(input);

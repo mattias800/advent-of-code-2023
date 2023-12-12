@@ -1,4 +1,4 @@
-import { getWinningNumbersFromCard } from "./common.mjs";
+import { getWinningNumbersFromCard } from "./common.mts";
 import lodash from "lodash";
 
 const { range } = lodash;

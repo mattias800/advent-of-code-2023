@@ -1,4 +1,4 @@
-import { range, tail } from "lodash";
+import { range } from "lodash";
 
 export interface Doc {
   pattern: string;
@@ -25,6 +25,8 @@ export const parseLine = (line: string): Doc => {
 export const getNumCombinations = (pattern: string, groups: Array<number>) =>
   traverseCombinations(pattern, groups, false, 0);
 
+const cache: Record<string, Record<string, number>> = {};
+
 /**
  * This is not my solution, it was taken from Youtube.
  * I used it to provide more expected values for unit test.
@@ -49,6 +51,12 @@ export const count = (pattern: string, groups: Array<number>): number => {
     }
   }
 
+  const groupsKey = groups.toString();
+
+  if (cache[pattern]?.[groupsKey]) {
+    return cache[pattern]?.[groupsKey];
+  }
+
   let result = 0;
 
   if (".?".indexOf(pattern.charAt(0)) >= 0) {
@@ -60,9 +68,13 @@ export const count = (pattern: string, groups: Array<number>): number => {
       pattern.substring(0, groups[0]).indexOf(".") < 0 &&
       (groups[0] === pattern.length || pattern[groups[0]] !== "#")
     ) {
-      result += count(pattern.substring(groups[0] + 1), tail(groups));
+      const [, ...tail] = groups;
+      result += count(pattern.substring(groups[0] + 1), tail);
     }
   }
+
+  cache[pattern] = cache[pattern] || {};
+  cache[pattern][groupsKey] = result;
   return result;
 };
 

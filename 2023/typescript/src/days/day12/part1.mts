@@ -1,4 +1,4 @@
-import { getNumCombinations, parseInput } from "./common.mjs";
+import { getNumCombinations, parseInput } from "./common.mts";
 
 export const getSolution = (input: string): number => {
   return parseInput(input)

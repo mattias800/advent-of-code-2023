@@ -3,7 +3,7 @@ import {
   findStartDirections,
   findTotalLength,
   parseTileMap,
-} from "./common.mjs";
+} from "./common.mts";
 
 export const getSolution = (input: string): number => {
   const tileMap = parseTileMap(input);

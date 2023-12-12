@@ -2,7 +2,7 @@ import {
   createSeedMapsBySource,
   readSeedMaps,
   resolveLocationForSeed,
-} from "./common.mjs";
+} from "./common.mts";
 
 export const part2 = (input: string) => {
   const { seedMaps, seeds } = readSeedMaps(input);

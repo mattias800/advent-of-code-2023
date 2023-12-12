@@ -1,6 +1,6 @@
 import { getSolution } from "../part1.mts";
 import fs from "fs";
-import { parseInput, predictNext } from "../common.mjs";
+import { parseInput, predictNext } from "../common.mts";
 
 describe("Day 09", () => {
   describe("Part 1", () => {

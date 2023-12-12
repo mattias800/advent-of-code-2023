@@ -1,4 +1,4 @@
-import { parseInput, predictNext } from "./common.mjs";
+import { parseInput, predictNext } from "./common.mts";
 
 export const part1 = (input: string) => {
   const solution = getSolution(input);

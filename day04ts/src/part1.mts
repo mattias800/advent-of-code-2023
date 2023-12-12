@@ -1,4 +1,4 @@
-import { getWinningNumbersFromCard } from "./common.mjs";
+import { getWinningNumbersFromCard } from "./common.mts";
 
 export const part1 = (input: string) => {
   const lines = input

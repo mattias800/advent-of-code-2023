@@ -4,7 +4,7 @@ import {
   getHandStrength,
   getMostCommonCard,
   HandBid,
-} from "./common.mjs";
+} from "./common.mts";
 
 export const strengthOrder = "J23456789TQKA";
 

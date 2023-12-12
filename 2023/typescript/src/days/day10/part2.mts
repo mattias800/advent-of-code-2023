@@ -11,7 +11,7 @@ import {
   Trail,
   TrailTileMap,
   TrailTileRow,
-} from "./common.mjs";
+} from "./common.mts";
 
 export const getSolution = (input: string): number => {
   const tileMap = parseTileMap(input);

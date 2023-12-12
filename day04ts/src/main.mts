@@ -1,6 +1,6 @@
 import fs from "fs";
-import { part1 } from "./part1.mjs";
-import { part2 } from "./part2.mjs";
+import { part1 } from "./part1.mts";
+import { part2 } from "./part2.mts";
 
 export const testinput =
   "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53\n" +

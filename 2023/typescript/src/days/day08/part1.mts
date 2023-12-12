@@ -1,4 +1,4 @@
-import { createNodeDic, traverse } from "./common.mjs";
+import { createNodeDic, traverse } from "./common.mts";
 
 export const part1 = (input: string) => {
   const solution = getSolution(input);

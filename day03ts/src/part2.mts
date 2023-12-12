@@ -3,7 +3,7 @@ import {
   getNeighbours,
   getNumbersInLine,
   NumberInLine,
-} from "./common.mjs";
+} from "./common.mts";
 
 export const part2 = (input: string) => {
   const lines = input.split("\n").filter((p) => p);

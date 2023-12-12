@@ -1,4 +1,4 @@
-import { getDiffList, parseLine, predictNext } from "../common.mjs";
+import { getDiffList, parseLine, predictNext } from "../common.mts";
 
 describe("Day 09", () => {
   describe("day09common", () => {

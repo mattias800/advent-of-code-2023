@@ -1,4 +1,4 @@
-import { getWins, RaceResult } from "./common.mjs";
+import { getWins, RaceResult } from "./common.mts";
 
 export const part1 = (input: string) => {
   const solution = getSolution(input);

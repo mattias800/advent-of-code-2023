@@ -1,4 +1,4 @@
-import { getNumCombinations, minPatternLengthForGroups } from "../common.mjs";
+import { getNumCombinations, minPatternLengthForGroups } from "../common.mts";
 
 describe("Day 11", () => {
   describe("day11common", () => {

@@ -2,7 +2,7 @@ import {
   byHandBidStrength,
   fromRowToHandBid,
   getHandStrength,
-} from "./common.mjs";
+} from "./common.mts";
 
 const strengthOrder = "x23456789TJQKA";
 

@@ -1,4 +1,4 @@
-import { range } from "lodash";
+import { range, tail } from "lodash";
 
 export interface Doc {
   pattern: string;
@@ -24,6 +24,47 @@ export const parseLine = (line: string): Doc => {
 
 export const getNumCombinations = (pattern: string, groups: Array<number>) =>
   traverseCombinations(pattern, groups, false, 0);
+
+/**
+ * This is not my solution, it was taken from Youtube.
+ * I used it to provide more expected values for unit test.
+ * Also, it is a much cleaner solution...
+ * @param pattern
+ * @param groups
+ */
+export const count = (pattern: string, groups: Array<number>): number => {
+  if (pattern === "") {
+    if (groups.length === 0) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+
+  if (groups.length === 0) {
+    if (pattern.indexOf("#") >= 0) {
+      return 0;
+    } else {
+      return 1;
+    }
+  }
+
+  let result = 0;
+
+  if (".?".indexOf(pattern.charAt(0)) >= 0) {
+    result += count(pattern.substring(1), groups);
+  }
+  if ("#?".indexOf(pattern.charAt(0)) >= 0) {
+    if (
+      groups[0] <= pattern.length &&
+      pattern.substring(0, groups[0]).indexOf(".") < 0 &&
+      (groups[0] === pattern.length || pattern[groups[0]] !== "#")
+    ) {
+      result += count(pattern.substring(groups[0] + 1), tail(groups));
+    }
+  }
+  return result;
+};
 
 export const traverseCombinations = (
   pattern: string,
@@ -102,6 +143,13 @@ export const traverseCombinations = (
     const nextGroups = group === 1 ? groupRest : [group - 1, ...groupRest];
 
     if (group === 1 && nextChar === "#") {
+      if (isInGroup) {
+        dl(
+          depth,
+          "match failed! notUsingUnknown because group does not want next #, but we are in group.",
+        );
+        return 0;
+      }
       dl(depth, "notUsingUnknown because group does not want next #");
       return traverseCombinations(patternRest, groups, false, depth + 1);
     }

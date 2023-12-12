@@ -65,6 +65,9 @@ describe("Day 11", () => {
       it("works with test data 6", () => {
         expect(getNumCombinations("?###????????", [3, 2, 1])).toBe(10);
       });
+      it("last row in input works", () => {
+        expect(getNumCombinations("#?.??#??.?", [2, 2])).toBe(2);
+      });
     });
   });
 });

@@ -1,8 +1,4 @@
-import { first, tail } from "lodash";
-
-export type Operational = ".";
-export type Damaged = "#";
-export type Unknown = "?";
+import { range } from "lodash";
 
 export interface Doc {
   pattern: string;
@@ -26,43 +22,136 @@ export const parseLine = (line: string): Doc => {
   };
 };
 
-export const getNumCombinations = (
+export const getNumCombinations = (pattern: string, groups: Array<number>) =>
+  traverseCombinations(pattern, groups, false, 0);
+
+export const traverseCombinations = (
   pattern: string,
   groups: Array<number>,
-  depth: number = 0,
+  isInGroup: boolean,
+  depth: number,
 ): number => {
-  console.log("-------------");
-  console.log("depth: " + depth);
-  console.log("pattern: " + pattern);
-  console.log("groups", groups);
-  let numCombinations = 0;
+  dl(depth, "-------------");
+  dl(depth, 'pattern: "' + pattern + '"');
+  dl(depth, "groups: " + groups.toString());
+  dl(depth, "isInGroup: " + isInGroup);
 
-  if (groups.length === 0) {
-    if (pattern.indexOf("#") >= 0 || pattern.indexOf("?") >= 0) {
-      return 0;
-    } else {
+  if (pattern === "") {
+    if (groups.length === 0) {
+      dl(depth, "found match! pattern is empty and there are no more groups.");
       return 1;
+    } else {
+      dl(depth, "no match! pattern is empty but there are still groups.");
+      return 0;
+    }
+  }
+  if (groups.length === 0) {
+    dl(depth, "no groups left");
+    if (pattern.indexOf("#") < 0) {
+      dl(depth, "found match! no more groups and pattern contains no more #");
+      return 1;
+    } else {
+      dl(depth, "no match, no more groups, but pattern contains more #");
+      return 0;
     }
   }
 
-  const group = groups[0];
+  if (minPatternLengthForGroups(groups) > pattern.length) {
+    dl(depth, "fail! pattern is not big enough for groups.");
+    return 0;
+  }
 
-  for (let i = 0; i < pattern.length; i++) {
-    const subpattern = pattern.substring(i, i + group);
+  const [group, ...groupRest] = groups;
 
-    const tailPattern = pattern.substring(subpattern.length);
-    numCombinations += getNumCombinations(tailPattern, groups, depth + 1);
-    if (canContainGroup(subpattern)) {
-      numCombinations += getNumCombinations(
-        tailPattern,
-        tail(groups),
+  if (pattern.length < group) {
+    dl(depth, "Not enough pattern left for group");
+    // Not enough pattern left for group.
+    return 0;
+  }
+
+  let numCombinations = 0;
+
+  const char = pattern.charAt(0);
+  const nextChar = pattern.charAt(1);
+  const patternRest = pattern.substring(1);
+
+  const patternRestWithDot =
+    group === 1 && patternRest.charAt(0) === "?"
+      ? "." + patternRest.substring(1)
+      : patternRest;
+
+  dl(depth, "char: " + char);
+  if (char === "#") {
+    if (group === 1 && nextChar === "#") {
+      dl(
+        depth,
+        "match failed, because group needs only this #, but next is also #.",
+      );
+      return 0;
+    }
+
+    const nextGroups = group === 1 ? groupRest : [group - 1, ...groupRest];
+    return traverseCombinations(
+      patternRestWithDot,
+      nextGroups,
+      group > 1,
+      depth + 1,
+    );
+  }
+  if (char === "?") {
+    const nextGroups = group === 1 ? groupRest : [group - 1, ...groupRest];
+
+    if (group === 1 && nextChar === "#") {
+      dl(depth, "notUsingUnknown because group does not want next #");
+      return traverseCombinations(patternRest, groups, false, depth + 1);
+    }
+
+    if (isInGroup) {
+      dl(depth, "usingUnknown only, because we are in group");
+      return traverseCombinations(
+        patternRestWithDot,
+        nextGroups,
+        group > 1,
         depth + 1,
       );
     }
-  }
 
+    dl(depth, "branch into using ?");
+    const usingUnknown = traverseCombinations(
+      patternRestWithDot,
+      nextGroups,
+      group > 1,
+      depth + 1,
+    );
+
+    dl(depth, "branch into not using ?");
+    const notUsingUnknown = traverseCombinations(
+      patternRest,
+      groups,
+      false,
+      depth + 1,
+    );
+
+    return usingUnknown + notUsingUnknown;
+  }
+  if (char === ".") {
+    if (isInGroup) {
+      // Group did not terminate correctly.
+      dl(depth, "Group terminated by dot.");
+      return 0;
+    }
+    return traverseCombinations(patternRest, groups, false, depth + 1);
+  }
+  dl(depth, "return numCombinations: " + numCombinations);
   return numCombinations;
 };
 
-const canContainGroup = (subpattern: string): boolean =>
-  subpattern.indexOf(".") < 0;
+const dl = (depth: number, s: string): void => {
+  const indent = range(0, depth)
+    .map(() => "   ")
+    .join("");
+  console.log(indent + s);
+};
+
+export const minPatternLengthForGroups = (groups: Array<number>): number =>
+  groups.reduce((sum, item) => sum + item, 0) + groups.length - 1;

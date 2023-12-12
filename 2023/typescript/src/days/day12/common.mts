@@ -33,14 +33,17 @@ export const getNumCombinations = (pattern: string, groups: Array<number>) =>
  * @param groups
  */
 export const count = (pattern: string, groups: Array<number>): number => {
-  return countTraverse(pattern, groups, 0);
+  const cache = {};
+  return countTraverse(pattern, groups, 0, 0, cache);
 };
 export const countTraverse = (
-  pattern: string,
+  fullPattern: string,
   groups: Array<number>,
+  patternIndex: number,
   groupsIndex: number,
+  cache: Record<number, Record<number, number>>,
 ): number => {
-  if (pattern === "") {
+  if (patternIndex >= fullPattern.length) {
     if (groupsIndex >= groups.length) {
       return 1;
     } else {
@@ -49,32 +52,51 @@ export const countTraverse = (
   }
 
   if (groupsIndex >= groups.length) {
-    if (pattern.indexOf("#") >= 0) {
+    if (fullPattern.indexOf("#", patternIndex) >= 0) {
       return 0;
     } else {
       return 1;
     }
   }
 
+  const cacheValue = cache[patternIndex]?.[groupsIndex];
+  if (cacheValue != null) {
+    return cacheValue;
+  }
+
   let result = 0;
 
-  if (".?".indexOf(pattern.charAt(0)) >= 0) {
-    result += countTraverse(pattern.substring(1), groups, groupsIndex);
+  const char = fullPattern.charAt(patternIndex);
+
+  if (char === "." || char === "?") {
+    result += countTraverse(
+      fullPattern,
+      groups,
+      patternIndex + 1,
+      groupsIndex,
+      cache,
+    );
   }
-  if ("#?".indexOf(pattern.charAt(0)) >= 0) {
+  if (char === "#" || char === "?") {
+    const indexOfDot = fullPattern.indexOf(".", patternIndex);
     if (
-      groups[groupsIndex] <= pattern.length &&
-      pattern.substring(0, groups[groupsIndex]).indexOf(".") < 0 &&
-      (groups[groupsIndex] === pattern.length ||
-        pattern[groups[groupsIndex]] !== "#")
+      groups[groupsIndex] <= fullPattern.length - patternIndex &&
+      (indexOfDot < 0 || indexOfDot >= patternIndex + groups[groupsIndex]) &&
+      (groups[groupsIndex] === fullPattern.length - patternIndex ||
+        fullPattern[patternIndex + groups[groupsIndex]] !== "#")
     ) {
       result += countTraverse(
-        pattern.substring(groups[groupsIndex] + 1),
+        fullPattern,
         groups,
+        patternIndex + groups[groupsIndex] + 1,
         groupsIndex + 1,
+        cache,
       );
     }
   }
+
+  cache[patternIndex] = cache[patternIndex] || {};
+  cache[patternIndex][groupsIndex] = result;
 
   return result;
 };

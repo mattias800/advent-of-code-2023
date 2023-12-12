@@ -23,11 +23,11 @@ describe("Day 11", () => {
 
         expect(getSolution(input)).toBe(525152);
       });
-      // it("works with input", () => {
-      //   expect(
-      //     getSolution(fs.readFileSync("./src/days/day12/input.txt").toString()),
-      //   ).toBe(842645913794);
-      // });
+      it("works with input", () => {
+        expect(
+          getSolution(fs.readFileSync("./src/days/day12/input.txt").toString()),
+        ).toBe(25470469710341);
+      });
     });
   });
 });

@@ -1,6 +1,6 @@
 import { getSolution } from "../part1.mts";
 import fs from "fs";
-import { count, getNumCombinations, parseInput } from "../common.mts";
+import { getNumCombinations, parseInput } from "../common.mts";
 
 describe("Day 11", () => {
   describe("Part 1", () => {

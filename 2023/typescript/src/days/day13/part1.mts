@@ -6,6 +6,7 @@ import {
 
 export const getSolution = (input: string): number => {
   const maps = parseInput(input);
+
   const verticals = maps
     .map((m) => findVerticalMirrorLine(m))
     .map((p) => (p != null ? p + 1 : 0))

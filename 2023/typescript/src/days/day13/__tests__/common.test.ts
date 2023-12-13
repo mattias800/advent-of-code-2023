@@ -1,6 +1,9 @@
 import {
+  calculateSolution,
   columnsAreEqual,
   findHorizontalMirrorLine,
+  findMirrorColumnWithMismatch,
+  findMirrorRowWithMismatch,
   findVerticalMirrorLine,
   parseInput,
 } from "../common.mts";
@@ -26,6 +29,47 @@ describe("Day 13", () => {
       "#....#..#";
     const maps = parseInput(testinput);
 
+    describe("calculateSolution", () => {
+      it("works with test data", () => {
+        expect(calculateSolution(maps)).toBe(405);
+      });
+    });
+
+    describe("findMirrorColumnWithMismatch", () => {
+      describe("when there is a vertical mirror line", () => {
+        it("finds it", () => {
+          expect(findMirrorColumnWithMismatch(maps[0], 0)).toBe(4);
+        });
+      });
+      describe("when there is no vertical mirror line", () => {
+        it("returns undefined", () => {
+          expect(findMirrorColumnWithMismatch(maps[1], 0)).toBe(undefined);
+        });
+      });
+    });
+
+    describe("findMirrorRowWithMismatch", () => {
+      describe("when there is a horizontal mirror line", () => {
+        it("finds it", () => {
+          expect(findMirrorRowWithMismatch(maps[1], 0)).toBe(3);
+        });
+      });
+      describe("when there is no horizontal mirror line", () => {
+        it("returns undefined", () => {
+          expect(findMirrorRowWithMismatch(maps[0], 0)).toBe(undefined);
+        });
+      });
+    });
+
+    describe("findMirrorRowWithMismatch", () => {
+      it("works with test data", () => {
+        expect(findMirrorRowWithMismatch(maps[0], 1)).toBe(2);
+      });
+      it("works with test data", () => {
+        expect(findMirrorRowWithMismatch(maps[1], 1)).toBe(0);
+      });
+    });
+
     describe("findVerticalMirrorLine", () => {
       describe("when there is a vertical mirror line", () => {
         it("finds it", () => {
@@ -38,6 +82,7 @@ describe("Day 13", () => {
         });
       });
     });
+
     describe("findHorizontalMirrorLine", () => {
       describe("when there is a horizontal mirror line", () => {
         it("finds it", () => {

@@ -1,7 +1,7 @@
 import {count, getNumCombinations, minPatternLengthForGroups} from "../common.mts";
 
-describe("Day 12", () => {
-  describe("day12common", () => {
+describe("Day 11", () => {
+  describe("day11common", () => {
     describe("minPatternLengthForGroups", () => {
       it("works", () => {
         expect(minPatternLengthForGroups([1, 2, 3])).toBe(8);

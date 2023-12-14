@@ -1,7 +1,7 @@
 import { getSolution } from "../part1.mjs";
 import fs from "fs";
 
-describe("Day 12", () => {
+describe("Day 13", () => {
   describe("Part 1", () => {
     describe("getSolution", () => {
       const testinput =

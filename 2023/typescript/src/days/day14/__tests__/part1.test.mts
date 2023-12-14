@@ -1,4 +1,5 @@
 import { getSolution } from "../part1.mjs";
+import fs from "fs";
 
 describe("Day 14", () => {
   describe("Part 1", () => {
@@ -19,11 +20,11 @@ describe("Day 14", () => {
         expect(getSolution(testdata)).toBe(136);
       });
 
-      // it("works with input", () => {
-      //   expect(
-      //     getSolution(fs.readFileSync("./src/days/day12/input.txt").toString()),
-      //   ).toBe(7286);
-      // });
+      it("works with input", () => {
+        expect(
+          getSolution(fs.readFileSync("./src/days/day14/input.txt").toString()),
+        ).toBe(7286);
+      });
     });
   });
 });

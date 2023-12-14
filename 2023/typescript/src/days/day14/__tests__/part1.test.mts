@@ -23,7 +23,7 @@ describe("Day 14", () => {
       it("works with input", () => {
         expect(
           getSolution(fs.readFileSync("./src/days/day14/input.txt").toString()),
-        ).toBe(7286);
+        ).toBe(108857);
       });
     });
   });

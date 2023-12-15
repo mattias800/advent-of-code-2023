@@ -1,3 +1,11 @@
+import { getAsciiHash } from "../common.mjs";
+
 describe("Day 15 Common", () => {
-  expect(true).toBe(true);
+  describe("getAsciiHash", () => {
+    describe("when s is HASH", () => {
+      it("returns 52", () => {
+        expect(getAsciiHash("HASH")).toBe(52);
+      });
+    });
+  });
 });

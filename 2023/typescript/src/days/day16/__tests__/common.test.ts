@@ -1,3 +1,3 @@
-describe("Day 15 Common", () => {
+describe("Day 16 Common", () => {
   expect(true).toBe(true);
 });

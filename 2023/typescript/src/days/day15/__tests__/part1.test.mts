@@ -11,7 +11,7 @@ describe("Day 15 Part 1", () => {
     it("works with input", () => {
       expect(
         getSolution(fs.readFileSync("./src/days/day15/input.txt").toString()),
-      ).toBe(7286);
+      ).toBe(514639);
     });
   });
 });

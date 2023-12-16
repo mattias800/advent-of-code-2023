@@ -4,7 +4,7 @@ export const getAsciiHash = (s: string): number => {
     const ascii = s.charCodeAt(i);
     result += ascii;
     result *= 17;
-    result = result % 256;
+    result %= 256;
   }
   return result;
 };

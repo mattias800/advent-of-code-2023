@@ -1,4 +1,4 @@
-describe("Day 17 Part 2 ", () => {
+describe("Day 18 Part 2 ", () => {
   describe("getSolution", () => {
     it("works with test data", () => {
       expect(true).toBe(false);

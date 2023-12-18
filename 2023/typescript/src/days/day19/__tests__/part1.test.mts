@@ -1,4 +1,4 @@
-describe("Day 17 Part 2 ", () => {
+describe("Day 19 Part 1", () => {
   describe("getSolution", () => {
     it("works with test data", () => {
       expect(true).toBe(false);
@@ -7,6 +7,6 @@ describe("Day 17 Part 2 ", () => {
     //   expect(
     //     getSolution(fs.readFileSync("./src/days/day12/input.txt").toString()),
     //   ).toBe(7286);
-    // });    });
+    // });
   });
 });

@@ -1,5 +1,3 @@
-import { exhaustSwitchCaseElseThrow } from "../../common/util/case/ExhaustiveSwitch.mts";
-
 export type NorthSouth = "|";
 export type EastWest = "-";
 export type NorthEast = "L";
@@ -8,10 +6,8 @@ export type SouthWest = "7";
 export type SouthEast = "F";
 export type Ground = ".";
 export type Start = "S";
-export type Inside = "I";
-export type Outside = "O";
 
-export type Direction = "north" | "south" | "east" | "west";
+export type DirectionCompass = "north" | "south" | "east" | "west";
 
 export type Tile =
   | NorthSouth
@@ -25,7 +21,7 @@ export type Tile =
 
 export type TileRow = Array<Tile>;
 
-export interface Position {
+export interface PositionColRow {
   column: number;
   row: number;
 }
@@ -47,7 +43,9 @@ export const createTrailTileMap = (tileMap: TileMap): TrailTileMap => {
     rows: tileMap.rows.map<TrailTileRow>((r) => r.map(() => "empty")),
   };
 };
-export const getOppositeDirection = (direction: Direction): Direction => {
+export const getOppositeDirection = (
+  direction: DirectionCompass,
+): DirectionCompass => {
   switch (direction) {
     case "east":
       return "west";
@@ -60,10 +58,12 @@ export const getOppositeDirection = (direction: Direction): Direction => {
   }
 };
 
-export const getTileAtPosition = (tileMap: TileMap, position: Position): Tile =>
-  tileMap.rows[position.row][position.column];
+export const getTileAtPosition = (
+  tileMap: TileMap,
+  position: PositionColRow,
+): Tile => tileMap.rows[position.row][position.column];
 
-export const findStart = (tileMap: TileMap): Position => {
+export const findStart = (tileMap: TileMap): PositionColRow => {
   for (let i = 0; i < tileMap.rows.length; i++) {
     const row = tileMap.rows[i];
     const column = row.findIndex((c) => c === "S");
@@ -90,78 +90,9 @@ export const parseTileMap = (input: string): TileMap => {
   };
 };
 
-export const getNextPossibleDirection = (
-  tile: Tile,
-  lastMoveDirection: Direction,
-): Direction => {
-  switch (tile) {
-    case "|": {
-      if (lastMoveDirection === "north") {
-        return "north";
-      }
-      if (lastMoveDirection === "south") {
-        return "south";
-      }
-      break;
-    }
-    case "-": {
-      if (lastMoveDirection === "east") {
-        return "east";
-      }
-      if (lastMoveDirection === "west") {
-        return "west";
-      }
-      break;
-    }
-    case "J": {
-      if (lastMoveDirection === "east") {
-        return "north";
-      }
-      if (lastMoveDirection === "south") {
-        return "west";
-      }
-      break;
-    }
-    case "F": {
-      if (lastMoveDirection === "west") {
-        return "south";
-      }
-      if (lastMoveDirection === "north") {
-        return "east";
-      }
-      break;
-    }
-    case "7": {
-      if (lastMoveDirection === "east") {
-        return "south";
-      }
-      if (lastMoveDirection === "north") {
-        return "west";
-      }
-      break;
-    }
-    case "L": {
-      if (lastMoveDirection === "west") {
-        return "north";
-      }
-      if (lastMoveDirection === "south") {
-        return "east";
-      }
-      break;
-    }
-    case ".":
-      break;
-    case "S":
-      break;
-    default:
-      exhaustSwitchCaseElseThrow(tile);
-  }
-  throw new Error("Cannot get direction for tile: " + tile);
-};
-
 export const getSurroundingPositions = (
-  position: Position,
-): Array<{ position: Position; direction: Direction }> => {
+  position: PositionColRow,
+): Array<{ position: PositionColRow; direction: DirectionCompass }> => {
   return [
     {
       position: { column: position.column, row: position.row - 1 },
@@ -181,7 +112,9 @@ export const getSurroundingPositions = (
     },
   ];
 };
-export const findStartDirections = (tileMap: TileMap): Array<Direction> => {
+export const findStartDirections = (
+  tileMap: TileMap,
+): Array<DirectionCompass> => {
   const startPosition = findStart(tileMap);
   const surrounding = getSurroundingPositions(startPosition);
   return surrounding
@@ -199,8 +132,8 @@ export const findStartDirections = (tileMap: TileMap): Array<Direction> => {
 };
 
 export const findTotalLength = (
-  currentPosition: Position,
-  nextDirection: Direction,
+  currentPosition: PositionColRow,
+  nextDirection: DirectionCompass,
   tileMap: TileMap,
   trailTileMap?: TrailTileMap,
 ): number => {
@@ -232,7 +165,9 @@ export const findTotalLength = (
   throw new Error("Could not find length in 100000 steps.");
 };
 
-export const getTileDirections = (tile: Tile): [Direction, Direction] => {
+export const getTileDirections = (
+  tile: Tile,
+): [DirectionCompass, DirectionCompass] => {
   switch (tile) {
     case "L":
       return ["north", "east"];
@@ -265,9 +200,9 @@ export const isTileWithDirection = (tile: Tile): boolean => {
 };
 
 export const goFromPosition = (
-  position: Position,
-  direction: Direction,
-): Position => {
+  position: PositionColRow,
+  direction: DirectionCompass,
+): PositionColRow => {
   switch (direction) {
     case "east":
       return { row: position.row, column: position.column + 1 };
@@ -288,7 +223,7 @@ export const replaceStartWithTile = (tileMap: TileMap): TileMap => {
 };
 
 export const getTileByDirections = (
-  directions: [Direction, Direction],
+  directions: [DirectionCompass, DirectionCompass],
 ): Tile => {
   if (directions.indexOf("north") >= 0 && directions.indexOf("east") >= 0) {
     return "L";

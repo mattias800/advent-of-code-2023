@@ -1,3 +1,6 @@
+import { getNextPosition, Position } from "../../common/location/Position.ts";
+import { Direction } from "../../common/location/Direction.ts";
+
 export type MirrorDictionary = Record<number, Record<number, Mirror>>;
 export type EnergyDictionary = Record<
   number,
@@ -10,19 +13,7 @@ export interface Grid {
   numColumns: number;
 }
 
-export type Up = "up";
-export type Down = "down";
-export type Left = "left";
-export type Right = "right";
-
 export type Mirror = "\\" | "/" | "|" | "-";
-
-export type Direction = Up | Down | Left | Right;
-
-export interface Position {
-  row: number;
-  column: number;
-}
 
 export const parseInput = (input: string): Grid => {
   const rows = input
@@ -150,27 +141,6 @@ export const traverse = (
         t("down");
         return;
     }
-  }
-};
-
-export const getNextPosition = (
-  position: Position,
-  direction: Direction,
-): Position => {
-  const next = { ...position };
-  switch (direction) {
-    case "left":
-      next.column--;
-      return next;
-    case "right":
-      next.column++;
-      return next;
-    case "up":
-      next.row--;
-      return next;
-    case "down":
-      next.row++;
-      return next;
   }
 };
 

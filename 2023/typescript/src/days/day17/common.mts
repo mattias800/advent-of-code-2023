@@ -25,7 +25,7 @@ export interface Node {
 
   // Done state
   numChecks: number;
-  done: boolean;
+  visited: boolean;
 
   // A*
   birdDistance: number;
@@ -61,7 +61,7 @@ export const createPriorityQueue = (lines: Array<string>): PriorityQueue => {
         shortestDistance: shortestDistance,
         from: undefined,
         numChecks: 0,
-        done: false,
+        visited: false,
         previousDirections: [],
       });
     }
@@ -79,14 +79,14 @@ export const start = (queue: PriorityQueue) => {
   for (let i = 0; i < 10000; i++) {
     queue.sort(byShortestDijkstra);
 
-    const node = queue.find((p) => !p.done);
+    const node = queue.find((p) => !p.visited);
 
     if (node == null) {
       console.log("Done after " + i + " increments.");
       return;
     }
 
-    calculateDistancesToNeighbours(node, queue);
+    visitNode(node, queue);
   }
 };
 
@@ -108,33 +108,15 @@ export const calculateHeatLoss = (node: Node, queue: PriorityQueue): number => {
   }
 };
 
-export const calculateDistancesToNeighbours = (
-  node: Node,
-  queue: PriorityQueue,
-) => {
-  if (node.done) {
-    return;
-  }
-
-  const neighbours = getAllNeighbours(node, queue).filter(
-    (n) => !isPreviousMovementStraight(node.previousDirections, n.direction),
-  );
+export const visitNode = (node: Node, queue: PriorityQueue) => {
+  const neighbours = getAllNeighbours(node, queue)
+    .filter((n) => !n.neighbour.visited)
+    .filter(
+      (n) => !isPreviousMovementStraight(node.previousDirections, n.direction),
+    );
 
   for (let i = 0; i < neighbours.length; i++) {
     const { neighbour } = neighbours[i];
-
-    if (neighbour.done) {
-      continue;
-    }
-
-    neighbour.numChecks++;
-    if (neighbour.numChecks >= neighbour.neighbours.length) {
-      neighbour.done = true;
-    }
-    node.numChecks++;
-    if (node.numChecks >= node.neighbours.length) {
-      node.done = true;
-    }
 
     if (
       neighbour.shortestDistance === Infinity ||
@@ -148,6 +130,8 @@ export const calculateDistancesToNeighbours = (
       );
     }
   }
+
+  node.visited = true;
 };
 
 export const getAllNeighbours = (
@@ -237,10 +221,6 @@ export const calculatePreviousDirections = (
   queue: Array<NavigationNode>,
   node: NavigationNode,
 ): Array<Direction> => {
-  console.log("--- calculatePreviousDirections")
-  console.log("--- calculatePreviousDirections")
-  console.log("--- calculatePreviousDirections")
-  console.log("--- calculatePreviousDirections")
   const list: Array<Direction> = [];
   cpd(queue, node, list);
   return list;
@@ -251,7 +231,6 @@ export const cpd = (
   node: NavigationNode,
   result: Array<Direction>,
 ) => {
-  console.log(node)
   if (node.from == null) {
     throw new Error(
       "Cannot calculate previous directions, not completed path.",
@@ -306,7 +285,6 @@ const decorate = (lines: Array<string>, queue: PriorityQueue, node: Node) => {
     ) ?? "*",
   );
 
-  console.log(node);
   if (node.isStartNode) {
     return;
   }

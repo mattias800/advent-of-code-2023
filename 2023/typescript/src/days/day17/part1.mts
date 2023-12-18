@@ -37,9 +37,7 @@ export const getSolutionForPosition = (
   const s = parseInput(input);
   const queue = createPriorityQueue(s);
 
-  console.log("go")
   start(queue);
-  console.log("done")
 
   const destinationNode = getNodeByPosition(queue, position);
 

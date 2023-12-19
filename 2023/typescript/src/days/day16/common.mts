@@ -72,73 +72,73 @@ export const traverse = (
     return t(arrivalDirection);
   }
 
-  if (arrivalDirection === "up") {
+  if (arrivalDirection === Direction.Up) {
     switch (tile) {
       case "|":
-        t("up");
+        t(Direction.Up);
         return;
       case "-":
-        t("left");
-        t("right");
+        t(Direction.Left);
+        t(Direction.Right);
         return;
       case "/":
-        t("right");
+        t(Direction.Right);
         return;
       case "\\":
-        t("left");
+        t(Direction.Left);
         return;
     }
   }
-  if (arrivalDirection === "down") {
+  if (arrivalDirection === Direction.Down) {
     switch (tile) {
       case "|":
-        t("down");
+        t(Direction.Down);
         return;
       case "-":
-        t("left");
-        t("right");
+        t(Direction.Left);
+        t(Direction.Right);
         return;
       case "/":
-        t("left");
+        t(Direction.Left);
         return;
       case "\\":
-        t("right");
-        return;
-    }
-  }
-
-  if (arrivalDirection === "left") {
-    switch (tile) {
-      case "|":
-        t("up");
-        t("down");
-        return;
-      case "-":
-        t("left");
-        return;
-      case "/":
-        t("down");
-        return;
-      case "\\":
-        t("up");
+        t(Direction.Right);
         return;
     }
   }
 
-  if (arrivalDirection === "right") {
+  if (arrivalDirection === Direction.Left) {
     switch (tile) {
       case "|":
-        t("up");
-        t("down");
+        t(Direction.Up);
+        t(Direction.Down);
         return;
       case "-":
-        t("right");
+        t(Direction.Left);
         return;
       case "/":
-        t("up");
+        t(Direction.Down);
         return;
       case "\\":
-        t("down");
+        t(Direction.Up);
+        return;
+    }
+  }
+
+  if (arrivalDirection === Direction.Right) {
+    switch (tile) {
+      case "|":
+        t(Direction.Up);
+        t(Direction.Down);
+        return;
+      case "-":
+        t(Direction.Right);
+        return;
+      case "/":
+        t(Direction.Up);
+        return;
+      case "\\":
+        t(Direction.Down);
         return;
     }
   }

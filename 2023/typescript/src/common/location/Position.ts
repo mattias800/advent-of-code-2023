@@ -1,4 +1,4 @@
-import { Direction } from "./Direction.ts";
+import { Direction, toDirection, toVector } from "./Direction.ts";
 
 export interface Position {
   row: number;
@@ -8,59 +8,45 @@ export interface Position {
 export const getNextPosition = (
   position: Position,
   direction: Direction,
-): Position => {
-  const next = { ...position };
-  switch (direction) {
-    case "left":
-      next.column--;
-      return next;
-    case "right":
-      next.column++;
-      return next;
-    case "up":
-      next.row--;
-      return next;
-    case "down":
-      next.row++;
-      return next;
-  }
-};
+): Position => addPosition(position, toVector(direction));
 
 export const getDirectionBetween = (
   from: Position,
   to: Position,
-): Direction | undefined => {
-  if (to.row === from.row && to.column === from.column - 1) {
-    return "left";
-  }
-  if (to.row === from.row && to.column === from.column + 1) {
-    return "right";
-  }
-  if (to.row === from.row - 1 && to.column === from.column) {
-    return "up";
-  }
-  if (to.row === from.row + 1 && to.column === from.column) {
-    return "down";
-  }
-};
+): Direction | undefined => toDirection(subPosition(to, from));
 
-export const getFourNeighbours = (
+export const getBoundedStraightNeighbours = (
   position: Position,
   numRows: number,
   numColumns: number,
-): Array<Position> => {
-  const list: Array<Position> = [];
-  if (position.row > 0) {
-    list.push({ row: position.row - 1, column: position.column });
-  }
-  if (position.row < numRows - 1) {
-    list.push({ row: position.row + 1, column: position.column });
-  }
-  if (position.column > 0) {
-    list.push({ row: position.row, column: position.column - 1 });
-  }
-  if (position.column < numColumns - 1) {
-    list.push({ row: position.row, column: position.column + 1 });
-  }
-  return list;
-};
+): Array<Position> =>
+  straightNeighbours
+    .map((s) => addPosition(position, s))
+    .filter(isWithinBounds(numRows, numColumns));
+
+export const isWithinBounds =
+  (numRows: number, numColumns: number) => (position: Position) =>
+    position.row >= 0 &&
+    position.row < numRows &&
+    position.column >= 0 &&
+    position.column < numColumns;
+
+export const straightNeighbours: Array<Position> = [
+  { column: 0, row: -1 },
+  { column: 0, row: 1 },
+  { column: -1, row: 0 },
+  { column: 1, row: 0 },
+];
+
+export const addPosition = (a: Position, b: Position): Position => ({
+  row: a.row + b.row,
+  column: a.column + b.column,
+});
+
+export const subPosition = (a: Position, b: Position): Position => ({
+  row: a.row - b.row,
+  column: a.column - b.column,
+});
+
+export const arePositionsEqual = (a: Position, b: Position): boolean =>
+  a.row === b.row && a.column === b.column;

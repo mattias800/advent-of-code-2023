@@ -1,4 +1,4 @@
-import { getSolution, getSolutionForPosition } from "../part1.mjs";
+import { getSolution } from "../part1.mjs";
 
 describe("Day 17 Part 1", () => {
   const testdata =
@@ -17,30 +17,13 @@ describe("Day 17 Part 1", () => {
     "4322674655533";
 
   describe("getSolution", () => {
-    it("works with two rows test data", () => {
-      const tworows = "2413432311323\n" + "3215453535623";
-      expect(getSolutionForPosition(tworows, { column: 1, row: 0 })).toBe(4);
-      expect(getSolutionForPosition(tworows, { column: 2, row: 0 })).toBe(5);
-      expect(getSolutionForPosition(tworows, { column: 2, row: 1 })).toBe(6);
-      expect(getSolutionForPosition(tworows, { column: 3, row: 1 })).toBe(11);
-      expect(getSolutionForPosition(tworows, { column: 4, row: 1 })).toBe(15);
-      expect(getSolutionForPosition(tworows, { column: 5, row: 1 })).toBe(20);
+    it("works with test data", () => {
+      expect(getSolution(testdata)).toBe(102);
     });
-    it("works with two rows test data 2", () => {
-      const tworows = "2413432311323\n" + "3215453535623";
-      expect(getSolutionForPosition(tworows, { column: 5, row: 0 })).toBe(23);
-    });
-    it("works with two rows test data 3", () => {
-      const tworows = "2413432311323\n" + "3215453535623";
-      expect(getSolutionForPosition(tworows, { column: 8, row: 1 })).toBe(29);
-    });
-     it("works with test data", () => {
-       expect(getSolution(testdata)).toBe(102);
-     });
     // it("works with input", () => {
     //   expect(
-    //     getSolution(fs.readFileSync("./src/days/day12/input.txt").toString()),
-    //   ).toBe(7286);
+    //     getSolution(fs.readFileSync("./src/days/day17/input.txt").toString()),
+    //   ).toBe(755);
     // });
   });
 });

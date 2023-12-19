@@ -1,37 +1,39 @@
 import {
-  getDirectionBetween,
-  getFourNeighbours,
+  addPosition,
+  isWithinBounds,
   Position,
 } from "../../common/location/Position.ts";
-import { Direction, directionToChar } from "../../common/location/Direction.ts";
+import {
+  Direction,
+  isOppositeDirection,
+  toVector,
+} from "../../common/location/Direction.ts";
 
-export interface NavigationNode {
-  from: Position | undefined;
-  position: Position;
-  isStartNode: boolean;
+export interface Visited {
+  row: number;
+  column: number;
+  direction: Direction | undefined;
+  numDirection: number;
 }
 
-export interface Node {
+export interface PriorityItem {
+  totalHeatLoss: number;
   position: Position;
-  heatLoss: number;
-  isStartNode: boolean;
-
-  // Dijkstra
-  shortestDistance: number;
-  from: Position | undefined;
-  previousDirections: Array<Direction>;
-
-  neighbours: Array<Position>;
-
-  // Done state
-  numChecks: number;
-  visited: boolean;
-
-  // A*
-  birdDistance: number;
+  direction: Direction | undefined;
+  numDirection: number;
 }
 
-export type PriorityQueue = Array<Node>;
+export type PriorityQueue = Array<PriorityItem>;
+
+export const createStartingPriorityItem = (): PriorityItem => ({
+  position: {
+    row: 0,
+    column: 0,
+  },
+  direction: undefined,
+  numDirection: 0,
+  totalHeatLoss: 0,
+});
 
 export const parseInput = (input: string): Array<string> =>
   input
@@ -40,271 +42,103 @@ export const parseInput = (input: string): Array<string> =>
     .filter((p) => p)
     .map((s) => s.trim());
 
-export const createPriorityQueue = (lines: Array<string>): PriorityQueue => {
-  let queue: PriorityQueue = [];
-  for (let row = 0; row < lines.length; row++) {
-    const line = lines[row];
-    for (let column = 0; column < line.length; column++) {
-      const heatLoss = parseInt(lines[row].charAt(column));
-      const shortestDistance = row === 0 && column === 0 ? 0 : Infinity;
+export const getMinimalHeatLoss = (
+  lines: Array<string>,
+  minMovesBeforeTurnOrStop: number,
+  maxMovesAfterTurn: number,
+): number => {
+  const visited = new Set<string>();
+  const queue: PriorityQueue = [createStartingPriorityItem()];
 
+  const numRows = lines.length;
+  const numColumns = lines[0].length;
+
+  const isInGrid = isWithinBounds(numRows, numColumns);
+
+  const addToQueue = (
+    item: PriorityItem,
+    nextPos: Position,
+    nextDirection: Direction,
+    numDirection: number,
+  ) => {
+    if (isInGrid(nextPos)) {
+      const nextHeatLoss = parseInt(lines[nextPos.row].charAt(nextPos.column));
       queue.push({
-        isStartNode: column === 0 && row === 0,
-        position: { column, row },
-        heatLoss,
-        neighbours: getFourNeighbours(
-          { column, row },
-          lines.length,
-          lines[0].length,
-        ),
-        birdDistance: lines.length - row + (line.length - column),
-        shortestDistance: shortestDistance,
-        from: undefined,
-        numChecks: 0,
-        visited: false,
-        previousDirections: [],
+        position: nextPos,
+        direction: nextDirection,
+        numDirection,
+        totalHeatLoss: item.totalHeatLoss + nextHeatLoss,
       });
     }
-  }
-  return queue;
-};
+  };
 
-export const byShortestDijkstra = (a: Node, b: Node): number =>
-  a.shortestDistance - b.shortestDistance;
+  while (queue.length) {
+    const item = queue.shift();
 
-export const byShortestAStar = (a: Node, b: Node): number =>
-  a.shortestDistance + a.birdDistance - (b.shortestDistance + b.birdDistance);
-
-export const start = (queue: PriorityQueue) => {
-  for (let i = 0; i < 10000; i++) {
-    queue.sort(byShortestDijkstra);
-
-    const node = queue.find((p) => !p.visited);
-
-    if (node == null) {
-      console.log("Done after " + i + " increments.");
-      return;
+    if (item == null) {
+      break;
     }
-
-    visitNode(node, queue);
-  }
-};
-
-export const calculateHeatLoss = (node: Node, queue: PriorityQueue): number => {
-  if (node.isStartNode) {
-    return 0;
-  }
-
-  if (node.from) {
-    const next = getNodeByPosition(queue, node.from);
-    if (!next) {
-      throw new Error(
-        "Unable to calculate heat loss, could not find node at from position.",
-      );
-    }
-    return node.shortestDistance + calculateHeatLoss(next, queue);
-  } else {
-    throw new Error("Unable to calculate heat loss, node has no from-node.");
-  }
-};
-
-export const visitNode = (node: Node, queue: PriorityQueue) => {
-  const neighbours = getAllNeighbours(node, queue)
-    .filter((n) => !n.neighbour.visited)
-    .filter(
-      (n) => !isPreviousMovementStraight(node.previousDirections, n.direction),
-    );
-
-  for (let i = 0; i < neighbours.length; i++) {
-    const { neighbour } = neighbours[i];
 
     if (
-      neighbour.shortestDistance === Infinity ||
-      node.shortestDistance + neighbour.heatLoss <= neighbour.shortestDistance
+      item.position.column === numColumns - 1 &&
+      item.position.row === numRows - 1 &&
+      item.numDirection >= minMovesBeforeTurnOrStop
     ) {
-      neighbour.shortestDistance = node.shortestDistance + neighbour.heatLoss;
-      neighbour.from = node.position;
-      neighbour.previousDirections = calculatePreviousDirections(
-        queue,
-        neighbour,
-      );
+      return item.totalHeatLoss;
     }
+
+    if (!isInGrid(item.position)) {
+      continue;
+    }
+
+    const visitedItem = visitedKey({
+      row: item.position.row,
+      column: item.position.column,
+      numDirection: item.numDirection,
+      direction: item.direction,
+    });
+
+    if (visited.has(visitedItem)) {
+      continue;
+    }
+
+    visited.add(visitedItem);
+
+    if (item.direction != null) {
+      if (item.numDirection < maxMovesAfterTurn) {
+        const nextPos = addPosition(item.position, toVector(item.direction));
+        addToQueue(item, nextPos, item.direction, item.numDirection + 1);
+      }
+    }
+
+    if (
+      item.direction == null ||
+      item.numDirection >= minMovesBeforeTurnOrStop
+    ) {
+      for (const nextDirection of [0, 1, 2, 3]) {
+        if (
+          nextDirection !== item.direction &&
+          (item.direction == null ||
+            !isOppositeDirection(nextDirection, item.direction))
+        ) {
+          addToQueue(
+            item,
+            addPosition(item.position, toVector(nextDirection)),
+            nextDirection,
+            1,
+          );
+        }
+      }
+    }
+
+    queue.sort(byTotalHeatLoss);
   }
 
-  node.visited = true;
+  throw new Error("Did not reach destination.");
 };
 
-export const getAllNeighbours = (
-  node: Node,
-  queue: PriorityQueue,
-): Array<{ neighbour: Node; direction: Direction }> => {
-  let list: Array<{ neighbour: Node; direction: Direction }> = [];
+export const byTotalHeatLoss = (a: PriorityItem, b: PriorityItem): number =>
+  a.totalHeatLoss - b.totalHeatLoss;
 
-  pushValue(
-    list,
-    "up",
-    queue.find(
-      (p) =>
-        p.position.row === node.position.row - 1 &&
-        p.position.column === node.position.column,
-    ),
-  );
-
-  pushValue(
-    list,
-    "down",
-    queue.find(
-      (p) =>
-        p.position.row === node.position.row + 1 &&
-        p.position.column === node.position.column,
-    ),
-  );
-
-  pushValue(
-    list,
-    "left",
-    queue.find(
-      (p) =>
-        p.position.row === node.position.row &&
-        p.position.column === node.position.column - 1,
-    ),
-  );
-
-  pushValue(
-    list,
-    "right",
-    queue.find(
-      (p) =>
-        p.position.row === node.position.row &&
-        p.position.column === node.position.column + 1,
-    ),
-  );
-
-  return list;
-};
-
-const pushValue = (
-  list: Array<{ neighbour: Node; direction: Direction }>,
-  direction: Direction,
-  neighbour: Node | undefined,
-) => {
-  if (neighbour != null) {
-    list.push({ neighbour, direction });
-  }
-};
-
-export const isPreviousMovementStraight = (
-  previousDirections: Array<Direction>,
-  nextDirection: Direction,
-): boolean => {
-  if (previousDirections.length < 3) {
-    return false;
-  }
-  return (
-    previousDirections[previousDirections.length - 1] === nextDirection &&
-    previousDirections[previousDirections.length - 2] === nextDirection &&
-    previousDirections[previousDirections.length - 3] === nextDirection
-  );
-};
-
-export const getNodeByPosition = <T extends NavigationNode>(
-  queue: Array<T>,
-  position: Position,
-): T | undefined =>
-  queue.find(
-    (node) =>
-      node.position.row === position.row &&
-      node.position.column === position.column,
-  );
-
-export const calculatePreviousDirections = (
-  queue: Array<NavigationNode>,
-  node: NavigationNode,
-): Array<Direction> => {
-  const list: Array<Direction> = [];
-  cpd(queue, node, list);
-  return list;
-};
-
-export const cpd = (
-  queue: Array<NavigationNode>,
-  node: NavigationNode,
-  result: Array<Direction>,
-) => {
-  if (node.from == null) {
-    throw new Error(
-      "Cannot calculate previous directions, not completed path.",
-    );
-  }
-  const prevNode = getNodeByPosition(queue, node.from);
-  if (prevNode == null) {
-    throw new Error(
-      "Cannot calculate previous directions, could not find previous node.",
-    );
-  }
-
-  const d = getDirectionBetween(prevNode.position, node.position);
-
-  if (d == null) {
-    throw new Error(
-      "Cannot calculate previous directions, could not find direction.",
-    );
-  }
-
-  result.unshift(d);
-
-  if (!prevNode.isStartNode) {
-    cpd(queue, prevNode, result);
-  }
-};
-
-export const decorateInputWithPath = (
-  input: string,
-  queue: PriorityQueue,
-  destinationPosition: Position,
-): string => {
-  const lines = parseInput(input);
-
-  const pos = getNodeByPosition(queue, destinationPosition);
-
-  if (pos == null) {
-    throw new Error("Could not decorate with path, found no end node.");
-  }
-
-  decorate(lines, queue, pos);
-
-  return lines.join("\n");
-};
-
-const decorate = (lines: Array<string>, queue: PriorityQueue, node: Node) => {
-  lines[node.position.row] = replaceInString(
-    lines[node.position.row],
-    node.position.column,
-    directionToChar(
-      node.previousDirections[node.previousDirections.length - 1],
-    ) ?? "*",
-  );
-
-  if (node.isStartNode) {
-    return;
-  }
-
-  if (node.from == null) {
-    throw new Error("Found empty from.");
-  }
-
-  const next = getNodeByPosition(queue, node.from);
-
-  if (next == null) {
-    throw new Error("Found no next.");
-  }
-
-  decorate(lines, queue, next);
-};
-
-export const replaceInString = (
-  s: string,
-  index: number,
-  replacement: string,
-) =>
-  s.substring(0, index) + replacement + s.substring(index + replacement.length);
+export const visitedKey = (visited: Visited) =>
+  `${visited.row}:${visited.column}:${visited.numDirection}:${visited.direction}`;

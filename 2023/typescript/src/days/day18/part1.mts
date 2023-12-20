@@ -1,3 +1,19 @@
+import {
+  countNumDigs,
+  digByCommands,
+  digInside,
+  digMapToString,
+  parseInput,
+} from "./common.mjs";
+
 export const getSolution = (input: string): number => {
-  return 0;
+  const commands = parseInput(input);
+
+  const digMap = digByCommands(commands);
+
+  console.log(digMapToString(digMap));
+  digInside(digMap);
+  console.log("");
+  console.log(digMapToString(digMap));
+  return countNumDigs(digMap);
 };

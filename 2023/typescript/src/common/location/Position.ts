@@ -5,6 +5,8 @@ export interface Position {
   column: number;
 }
 
+export type PositionMap<T> = Record<number, Record<number, T>>;
+
 export const getNextPosition = (
   position: Position,
   direction: Direction,
@@ -50,3 +52,10 @@ export const subPosition = (a: Position, b: Position): Position => ({
 
 export const arePositionsEqual = (a: Position, b: Position): boolean =>
   a.row === b.row && a.column === b.column;
+
+export const getMinBoundingBox = (a: Position, b: Position): Position => {
+  return {
+    row: Math.max(a.row, b.row),
+    column: Math.max(a.column, b.column),
+  };
+};

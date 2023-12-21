@@ -1,4 +1,4 @@
-import { range } from "lodash";
+import { dl } from "../../common/log/Log.ts";
 
 export interface Doc {
   pattern: string;
@@ -227,13 +227,6 @@ export const traverseCombinations = (
   }
   dl(depth, "return numCombinations: " + numCombinations);
   return numCombinations;
-};
-
-const dl = (depth: number, s: string): void => {
-  const indent = range(0, depth)
-    .map(() => "   ")
-    .join("");
-  console.log(indent + s);
 };
 
 export const minPatternLengthForGroups = (groups: Array<number>): number =>

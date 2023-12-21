@@ -24,7 +24,7 @@ describe("Day 18 Part 1", () => {
     it("works with input", () => {
       expect(
         getSolution(fs.readFileSync("./src/days/day18/input.txt").toString()),
-      ).toBe(7286);
+      ).toBe(92758);
     });
   });
 });

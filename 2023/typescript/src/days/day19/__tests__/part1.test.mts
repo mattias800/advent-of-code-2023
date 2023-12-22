@@ -1,8 +1,5 @@
-import {
-  parseInput,
-  processMachinePart,
-  workflowMachinePart,
-} from "../common.mjs";
+import { getSolution } from "../part1.mjs";
+import fs from "fs";
 
 describe("Day 19 Part 1", () => {
   describe("getSolution", () => {
@@ -26,17 +23,12 @@ describe("Day 19 Part 1", () => {
       "{x=2127,m=1623,a=2188,s=1013}";
 
     it("works with test data", () => {
-      const system = parseInput(testdata);
-
-      const results = system.machineParts.map(machinePart => processMachinePart(machinePart, system.workflows));
-
-      console.log(results);
-      expect(true).toBe(false);
+      expect(getSolution(testdata)).toBe(19114);
     });
-    // it("works with input", () => {
-    //   expect(
-    //     getSolution(fs.readFileSync("./src/days/day12/input.txt").toString()),
-    //   ).toBe(7286);
-    // });
+    it("works with input", () => {
+      expect(
+        getSolution(fs.readFileSync("./src/days/day19/input.txt").toString()),
+      ).toBe(449531);
+    });
   });
 });

@@ -29,7 +29,11 @@ interface RuleWithNoOperator {
 }
 
 export const parseInput = (input: string): System => {
-  const [w, m] = input.split("\n\n");
+  const [w, m] = input
+    .trim()
+    .split("\n\n")
+    .map((p) => p.trim());
+
   return {
     workflows: w.split("\n").map(parseWorkflow),
     machineParts: m.split("\n").map(parseMachineParts),
@@ -101,7 +105,7 @@ export const processMachinePart = (
   machinePart: MachinePart,
   workflows: Array<Workflow>,
 ) => {
-  let currentRuleName = workflows[0].name;
+  let currentRuleName = "in";
   for (let i = 0; i < 100; i++) {
     const workflow = workflows.find((w) => w.name === currentRuleName);
     if (workflow == null) {
@@ -139,3 +143,6 @@ export const workflowMachinePart = (
   }
   throw new Error("Reached end of workflow without next.");
 };
+
+export const getMachinePartRating = (m: MachinePart): number =>
+  m.x + m.m + m.a + m.s;

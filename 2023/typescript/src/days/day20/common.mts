@@ -3,6 +3,7 @@ export interface ModuleConfiguration {
 }
 
 export type ModuleType = "&" | "%" | "broadcast";
+export type Signal = "low" | "high";
 
 export interface ModuleInput {
   name: string;

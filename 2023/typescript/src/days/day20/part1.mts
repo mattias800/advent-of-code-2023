@@ -1,13 +1,13 @@
 import {
   getAllInputConnectedToModule,
   ModuleConfiguration,
-  ModuleInput,
   parseInput,
+  Signal,
 } from "./common.mjs";
 
 export const getSolution = (input: string): number => {
   const config = parseInput(input);
-  console.log(config);
+  pressButton(config);
   return 0;
 };
 
@@ -17,7 +17,7 @@ interface FlipFlopState {
 
 interface ConjunctionInputMemory {
   from: string;
-  memHigh: boolean;
+  signalMemory: Signal;
 }
 
 interface ConjunctionState {
@@ -27,12 +27,13 @@ interface ConjunctionState {
 interface ModuleState {
   flipFlips: Record<string, FlipFlopState>;
   conjunctions: Record<string, ConjunctionState>;
+  log: Array<PulseQueueItem>;
 }
 
 export const createInitialModuleState = (
   config: ModuleConfiguration,
 ): ModuleState => {
-  return config.rows.reduce<ModuleState>(
+  return config.rows.reduce(
     (sum, item) => {
       if (item.input.type === "%") {
         sum.flipFlips[item.input.name] = {
@@ -44,26 +45,28 @@ export const createInitialModuleState = (
           inputMemory: getAllInputConnectedToModule(
             item.input.name,
             config,
-          ).map((from) => ({ from, memHigh: false })),
+          ).map((from) => ({ from, signalMemory: "low" })),
         };
       }
       return sum;
     },
-    { conjunctions: {}, flipFlips: {} },
+    { conjunctions: {}, flipFlips: {}, log: [] } as ModuleState,
   );
 };
 
 export const pressButton = (config: ModuleConfiguration) => {
   const pulseQueue: PulseQueue = [
     {
-      from: { name: "button", type: "broadcast" },
-      high: false,
+      from: "button",
+      signal: "low",
       output: "broadcaster",
     },
   ];
   const state: ModuleState = createInitialModuleState(config);
 
   while (pulseQueue.length) {
+    console.log("--------");
+    console.log(pulseQueue[0]);
     processPulseQueue(pulseQueue, state, config);
   }
 };
@@ -71,8 +74,8 @@ export const pressButton = (config: ModuleConfiguration) => {
 export type PulseQueue = Array<PulseQueueItem>;
 
 export interface PulseQueueItem {
-  from: ModuleInput;
-  high: boolean;
+  from: string;
+  signal: Signal;
   output: string;
 }
 
@@ -99,34 +102,72 @@ export const processPulseQueue = (
     throw new Error("Found no input.");
   }
 
-  if (item.from.type === "broadcast") {
-    const nextHigh = item.high;
-    nextOutputs.forEach((nextOutput) => {
-      queue.push({ from: nextFrom, high: nextHigh, output: nextOutput });
-    });
+  nextOutputs.forEach((output) => {
+    const nextSignal = sendSignalToModule(
+      item.signal,
+      item.from,
+      output,
+      state,
+      config,
+    );
+    if (nextSignal != null) {
+      nextOutputs.forEach((nextOutput) => {
+        queue.push({ from: output, signal: nextSignal, output: nextOutput });
+      });
+    }
+  });
+};
+
+const sendSignalToModule = (
+  signal: Signal,
+  sourceModuleName: string,
+  targetModuleName: string,
+  state: ModuleState,
+  config: ModuleConfiguration,
+): Signal | undefined => {
+  const targetModule = config.rows.find((r) => r.input.name == targetModuleName)
+    ?.input;
+
+  if (targetModule == null) {
+    throw new Error("Sending to invalid module: " + targetModuleName);
   }
 
-  if (item.from.type === "%") {
-    let nextHigh = item.high;
-    const moduleState = state.flipFlips[item.from.name];
-    if (!item.high) {
-      moduleState.on = !moduleState.on;
-      nextHigh = moduleState.on;
+  if (targetModule.type === "&") {
+    const targetModuleState = state.conjunctions[
+      targetModule.name
+    ].inputMemory.find((m) => m.from === sourceModuleName);
+
+    if (targetModuleState == null) {
+      throw new Error("& module is missing state for input.");
     }
-    nextOutputs.forEach((nextOutput) => {
-      queue.push({ from: nextFrom, high: nextHigh, output: nextOutput });
-    });
+
+    targetModuleState.signalMemory = signal;
+
+    return allConjunctionInputsAreHigh(targetModule.name, state)
+      ? "low"
+      : "high";
   }
 
-  if (item.from.type === "&") {
-    let nextHigh = item.high;
-    const moduleState = state.conjunctions[item.from.name];
-    if (!item.high) {
-      moduleState.on = !moduleState.on;
-      nextHigh = moduleState.on;
+  if (targetModule.type === "%") {
+    if (signal === "high") {
+      return undefined;
     }
-    nextOutputs.forEach((nextOutput) => {
-      queue.push({ from: nextFrom, high: nextHigh, output: nextOutput });
-    });
+
+    const targetModuleState = state.flipFlips[targetModule.name];
+
+    targetModuleState.on = !targetModuleState.on;
+
+    return targetModuleState.on ? "high" : "low";
   }
+
+  return signal;
+};
+
+const allConjunctionInputsAreHigh = (
+  moduleName: string,
+  state: ModuleState,
+) => {
+  const moduleState = state.conjunctions[moduleName];
+  const anyIsLow = moduleState.inputMemory.some((m) => !m.signalMemory);
+  return !anyIsLow;
 };

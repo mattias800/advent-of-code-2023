@@ -1,7 +1,16 @@
-describe("Day 19 Part 1", () => {
+import {getSolution} from "../part1.mjs";
+
+describe("Day 20 Part 1", () => {
   describe("getSolution", () => {
+    const testdata =
+      "broadcaster -> a, b, c\n" +
+      "%a -> b\n" +
+      "%b -> c\n" +
+      "%c -> inv\n" +
+      "&inv -> a";
+
     it("works with test data", () => {
-      expect(true).toBe(false);
+      expect(getSolution(testdata)).toBe(1);
     });
     // it("works with input", () => {
     //   expect(

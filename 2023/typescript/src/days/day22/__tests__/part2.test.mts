@@ -1,12 +1,5 @@
-describe("Day 20 Part 2 ", () => {
+describe("Day 19 Part 2 ", () => {
   describe("getSolution", () => {
-    const testdata =
-        "broadcaster -> a, b, c\n" +
-        "%a -> b\n" +
-        "%b -> c\n" +
-        "%c -> inv\n" +
-        "&inv -> a";
-
     it("works with test data", () => {
       expect(true).toBe(false);
     });

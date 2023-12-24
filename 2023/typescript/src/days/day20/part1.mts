@@ -1,6 +1,8 @@
 import {
+  ConfigRow,
   getAllInputConnectedToModule,
   ModuleConfiguration,
+  ModuleInput,
   parseInput,
   Signal,
 } from "./common.mjs";
@@ -65,9 +67,21 @@ export const pressButton = (config: ModuleConfiguration) => {
   const state: ModuleState = createInitialModuleState(config);
 
   while (pulseQueue.length) {
-    console.log("--------");
     console.log(pulseQueue[0]);
-    processPulseQueue(pulseQueue, state, config);
+    const item = pulseQueue.shift();
+
+    if (item == null) {
+      return;
+    }
+
+    sendSignalToModule(
+      item.signal,
+      item.from,
+      item.output,
+      state,
+      config,
+      pulseQueue,
+    );
   }
 };
 
@@ -79,88 +93,100 @@ export interface PulseQueueItem {
   output: string;
 }
 
-export const processPulseQueue = (
-  queue: PulseQueue,
-  state: ModuleState,
-  config: ModuleConfiguration,
-) => {
-  const item = queue.shift();
-
-  if (item == null) {
-    return;
-  }
-
-  const nextConfig = config.rows.find((r) => r.input.name === item.output);
-  const nextFrom = config.rows.find((r) => r.input.name == item.output)?.input;
-  const nextOutputs = nextConfig?.outputs;
-
-  if (nextOutputs == null || nextOutputs.length === 0) {
-    throw new Error("Found no outputs.");
-  }
-
-  if (nextFrom == null) {
-    throw new Error("Found no input.");
-  }
-
-  nextOutputs.forEach((output) => {
-    const nextSignal = sendSignalToModule(
-      item.signal,
-      item.from,
-      output,
-      state,
-      config,
-    );
-    if (nextSignal != null) {
-      nextOutputs.forEach((nextOutput) => {
-        queue.push({ from: output, signal: nextSignal, output: nextOutput });
-      });
-    }
-  });
-};
-
 const sendSignalToModule = (
   signal: Signal,
   sourceModuleName: string,
   targetModuleName: string,
   state: ModuleState,
   config: ModuleConfiguration,
-): Signal | undefined => {
-  const targetModule = config.rows.find((r) => r.input.name == targetModuleName)
-    ?.input;
+  queue: PulseQueue,
+) => {
+  const targetConfig = config.rows.find(
+    (r) => r.input.name == targetModuleName,
+  );
 
-  if (targetModule == null) {
-    throw new Error("Sending to invalid module: " + targetModuleName);
+  if (targetConfig == null) {
+    throw new Error("Cannot find config: " + targetModuleName);
   }
+
+  const targetModule = targetConfig.input;
 
   if (targetModule.type === "&") {
-    const targetModuleState = state.conjunctions[
-      targetModule.name
-    ].inputMemory.find((m) => m.from === sourceModuleName);
-
-    if (targetModuleState == null) {
-      throw new Error("& module is missing state for input.");
+    const nextSignal = writeToConjectureModuleAndGetNextSignal(
+      signal,
+      sourceModuleName,
+      targetModule,
+      state,
+    );
+    pushOutputsToQueue(nextSignal, targetConfig, queue);
+  } else if (targetModule.type === "%") {
+    const nextSignal = writeToFlipFlopModuleAndGetNextSignal(
+      signal,
+      targetModule,
+      state,
+    );
+    if (nextSignal != null) {
+      pushOutputsToQueue(nextSignal, targetConfig, queue);
     }
+  } else {
+    pushOutputsToQueue(signal, targetConfig, queue);
+  }
+};
 
-    targetModuleState.signalMemory = signal;
+export const pushOutputsToQueue = (
+  signal: Signal,
+  targetConfig: ConfigRow,
+  queue: PulseQueue,
+) => {
+  targetConfig.outputs.forEach((output) => {
+    queue.push({ from: targetConfig.input.name, signal, output });
+  });
+};
 
-    return allConjunctionInputsAreHigh(targetModule.name, state)
-      ? "low"
-      : "high";
+export const writeToFlipFlopModuleAndGetNextSignal = (
+  signal: Signal,
+  targetModule: ModuleInput,
+  state: ModuleState,
+) => {
+  if (signal === "high") {
+    return undefined;
   }
 
-  if (targetModule.type === "%") {
-    if (signal === "high") {
-      return undefined;
-    }
+  const targetModuleState = state.flipFlips[targetModule.name];
 
-    const targetModuleState = state.flipFlips[targetModule.name];
+  targetModuleState.on = !targetModuleState.on;
 
-    targetModuleState.on = !targetModuleState.on;
+  return targetModuleState.on ? "high" : "low";
+};
 
-    return targetModuleState.on ? "high" : "low";
+export const writeToConjectureModuleAndGetNextSignal = (
+  signal: Signal,
+  sourceModuleName: string,
+  targetModule: ModuleInput,
+  state: ModuleState,
+) => {
+  const conjunctionState = state.conjunctions[targetModule.name];
+
+  if (conjunctionState == null) {
+    throw new Error("& module is missing state: " + targetModule.name);
   }
 
-  return signal;
+  const targetModuleState = conjunctionState.inputMemory.find(
+    (m) => m.from === sourceModuleName,
+  );
+
+  if (targetModuleState == null) {
+    throw new Error(
+      "& module " +
+        targetModule.name +
+        " is missing state for input: " +
+        sourceModuleName,
+    );
+  }
+
+  targetModuleState.signalMemory = signal;
+
+  return allConjunctionInputsAreHigh(targetModule.name, state) ? "low" : "high";
 };
 
 const allConjunctionInputsAreHigh = (

@@ -3,6 +3,7 @@ import {
   getAllInputConnectedToModule,
   ModuleConfiguration,
   ModuleInput,
+  ModuleState,
   parseInput,
   Signal,
 } from "./common.mjs";
@@ -15,27 +16,6 @@ export const getSolution = (input: string): number => {
   }
   return state.numLow * state.numHigh;
 };
-
-interface FlipFlopState {
-  on: boolean;
-}
-
-interface ConjunctionInputMemory {
-  from: string;
-  signalMemory: Signal;
-}
-
-interface ConjunctionState {
-  inputMemory: Array<ConjunctionInputMemory>;
-}
-
-interface ModuleState {
-  flipFlips: Record<string, FlipFlopState>;
-  conjunctions: Record<string, ConjunctionState>;
-  log: Array<PulseQueueItem>;
-  numLow: number;
-  numHigh: number;
-}
 
 export const createInitialModuleState = (
   config: ModuleConfiguration,
@@ -61,6 +41,7 @@ export const createInitialModuleState = (
       conjunctions: {},
       flipFlips: {},
       log: [],
+      reachedLowRx: false,
       numHigh: 0,
       numLow: 0,
     } as ModuleState,
@@ -119,12 +100,17 @@ const sendSignalToModule = (
   config: ModuleConfiguration,
   queue: PulseQueue,
 ) => {
+  if (targetModuleName === "rx" && signal === "low") {
+    state.reachedLowRx = true;
+    return;
+  }
+
   const targetConfig = config.rows.find(
     (r) => r.input.name == targetModuleName,
   );
 
   if (targetConfig == null) {
-    throw new Error("Cannot find config: " + targetModuleName);
+    return;
   }
 
   const targetModule = targetConfig.input;

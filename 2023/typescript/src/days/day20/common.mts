@@ -1,3 +1,5 @@
+import { PulseQueueItem } from "./part1.mjs";
+
 export interface ModuleConfiguration {
   rows: Array<ConfigRow>;
 }
@@ -63,3 +65,25 @@ export const getAllInputConnectedToModule = (
   config.rows
     .filter((row) => row.outputs.includes(moduleName))
     .map((row) => row.input.name);
+
+export interface FlipFlopState {
+  on: boolean;
+}
+
+export interface ConjunctionInputMemory {
+  from: string;
+  signalMemory: Signal;
+}
+
+export interface ConjunctionState {
+  inputMemory: Array<ConjunctionInputMemory>;
+}
+
+export interface ModuleState {
+  flipFlips: Record<string, FlipFlopState>;
+  conjunctions: Record<string, ConjunctionState>;
+  log: Array<PulseQueueItem>;
+  reachedLowRx: boolean;
+  numLow: number;
+  numHigh: number;
+}

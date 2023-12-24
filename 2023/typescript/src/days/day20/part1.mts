@@ -9,8 +9,11 @@ import {
 
 export const getSolution = (input: string): number => {
   const config = parseInput(input);
-  pressButton(config);
-  return 0;
+  const state = createInitialModuleState(config);
+  for (let i = 0; i < 1000; i++) {
+    pressButton(state, config);
+  }
+  return state.numLow * state.numHigh;
 };
 
 interface FlipFlopState {
@@ -30,6 +33,8 @@ interface ModuleState {
   flipFlips: Record<string, FlipFlopState>;
   conjunctions: Record<string, ConjunctionState>;
   log: Array<PulseQueueItem>;
+  numLow: number;
+  numHigh: number;
 }
 
 export const createInitialModuleState = (
@@ -52,11 +57,20 @@ export const createInitialModuleState = (
       }
       return sum;
     },
-    { conjunctions: {}, flipFlips: {}, log: [] } as ModuleState,
+    {
+      conjunctions: {},
+      flipFlips: {},
+      log: [],
+      numHigh: 0,
+      numLow: 0,
+    } as ModuleState,
   );
 };
 
-export const pressButton = (config: ModuleConfiguration) => {
+export const pressButton = (
+  state: ModuleState,
+  config: ModuleConfiguration,
+) => {
   const pulseQueue: PulseQueue = [
     {
       from: "button",
@@ -64,14 +78,18 @@ export const pressButton = (config: ModuleConfiguration) => {
       output: "broadcaster",
     },
   ];
-  const state: ModuleState = createInitialModuleState(config);
 
   while (pulseQueue.length) {
-    console.log(pulseQueue[0]);
     const item = pulseQueue.shift();
 
     if (item == null) {
-      return;
+      break;
+    }
+
+    if (item.signal === "low") {
+      state.numLow++;
+    } else {
+      state.numHigh++;
     }
 
     sendSignalToModule(

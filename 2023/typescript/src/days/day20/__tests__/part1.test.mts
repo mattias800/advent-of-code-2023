@@ -1,16 +1,26 @@
-import {getSolution} from "../part1.mjs";
+import { getSolution } from "../part1.mjs";
 
 describe("Day 20 Part 1", () => {
   describe("getSolution", () => {
-    const testdata =
-      "broadcaster -> a, b, c\n" +
-      "%a -> b\n" +
-      "%b -> c\n" +
-      "%c -> inv\n" +
-      "&inv -> a";
-
     it("works with test data", () => {
-      expect(getSolution(testdata)).toBe(1);
+      const testdata =
+        "broadcaster -> a, b, c\n" +
+        "%a -> b\n" +
+        "%b -> c\n" +
+        "%c -> inv\n" +
+        "&inv -> a";
+
+      expect(getSolution(testdata)).toBe(32000000);
+    });
+
+    it("works with second test data", () => {
+      const testdata =
+        "broadcaster -> a\n" +
+        "%a -> inv, con\n" +
+        "&inv -> b\n" +
+        "%b -> con\n" +
+        "&con -> output";
+      expect(getSolution(testdata)).toBe(11687500);
     });
     // it("works with input", () => {
     //   expect(

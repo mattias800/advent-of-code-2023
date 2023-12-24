@@ -111,15 +111,7 @@ const sendSignalToModule = (
 
   const targetModule = targetConfig.input;
 
-  if (targetModule.type === "&") {
-    const nextSignal = writeToConjectureModuleAndGetNextSignal(
-      signal,
-      sourceModuleName,
-      targetModule,
-      state,
-    );
-    pushOutputsToQueue(nextSignal, targetConfig, queue);
-  } else if (targetModule.type === "%") {
+  if (targetModule.type === "%") {
     const nextSignal = writeToFlipFlopModuleAndGetNextSignal(
       signal,
       targetModule,
@@ -128,6 +120,14 @@ const sendSignalToModule = (
     if (nextSignal != null) {
       pushOutputsToQueue(nextSignal, targetConfig, queue);
     }
+  } else if (targetModule.type === "&") {
+    const nextSignal = writeToConjectureModuleAndGetNextSignal(
+      signal,
+      sourceModuleName,
+      targetModule,
+      state,
+    );
+    pushOutputsToQueue(nextSignal, targetConfig, queue);
   } else {
     pushOutputsToQueue(signal, targetConfig, queue);
   }
@@ -167,22 +167,9 @@ export const writeToConjectureModuleAndGetNextSignal = (
 ) => {
   const conjunctionState = state.conjunctions[targetModule.name];
 
-  if (conjunctionState == null) {
-    throw new Error("& module is missing state: " + targetModule.name);
-  }
-
   const targetModuleState = conjunctionState.inputMemory.find(
     (m) => m.from === sourceModuleName,
-  );
-
-  if (targetModuleState == null) {
-    throw new Error(
-      "& module " +
-        targetModule.name +
-        " is missing state for input: " +
-        sourceModuleName,
-    );
-  }
+  )!;
 
   targetModuleState.signalMemory = signal;
 
@@ -194,6 +181,9 @@ const allConjunctionInputsAreHigh = (
   state: ModuleState,
 ) => {
   const moduleState = state.conjunctions[moduleName];
-  const anyIsLow = moduleState.inputMemory.some((m) => !m.signalMemory);
+
+  const anyIsLow = moduleState.inputMemory.some(
+    (m) => m.signalMemory === "low",
+  );
   return !anyIsLow;
 };

@@ -11,7 +11,7 @@ describe("Day 19 Part 1", () => {
         "2,0,5~2,2,5\n" +
         "0,1,6~2,1,6\n" +
         "1,1,8~1,1,9";
-      expect(getSolution(testdata)).toBe(false);
+      expect(getSolution(testdata)).toBe(5);
     });
     // it("works with input", () => {
     //   expect(

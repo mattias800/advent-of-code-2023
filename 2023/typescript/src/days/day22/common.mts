@@ -4,7 +4,7 @@ import {
   Vector,
 } from "../../common/location/Vector.ts";
 
-interface Brick {
+export interface Brick {
   start: Vector;
   end: Vector;
 }
@@ -42,6 +42,14 @@ export const getSupportingBricks = (
   allBricks
     .filter((b) => !isBrickEqual(brick, b))
     .filter((b) => brickIsSupported(brick, b));
+
+export const getBricksBeingSupported = (
+  brick: Brick,
+  allBricks: Array<Brick>,
+): Array<Brick> =>
+  allBricks
+    .filter((b) => !isBrickEqual(brick, b))
+    .filter((b) => brickIsSupported(b, brick));
 
 export const isBrickEqual = (a: Brick, b: Brick): boolean =>
   isVectorEqual(a.start, b.start) && isVectorEqual(a.end, b.end);

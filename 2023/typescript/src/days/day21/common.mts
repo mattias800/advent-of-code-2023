@@ -4,6 +4,16 @@ import {
   PositionMap,
 } from "../../common/location/Position.ts";
 
+export interface Garden {
+  maps: PositionMap<GardenTile>;
+}
+
+export interface GardenTile {
+    prevNumReachedPlots: Array<number>;
+    gardenMap: GardenMap | undefined;
+    done: boolean;
+}
+
 export interface GardenMap {
   stones: PositionMap<"#">;
   reachedPlots: PositionMap<"O">;

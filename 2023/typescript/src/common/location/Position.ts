@@ -36,6 +36,10 @@ export const getBoundedStraightNeighbours = (
     .map((s) => addPosition(position, s))
     .filter(isWithinBounds(numRows, numColumns));
 
+export const getNonBoundedStraightNeighbours = (
+  position: Position,
+): Array<Position> => straightNeighbours.map((s) => addPosition(position, s));
+
 export const isWithinBounds =
   (numRows: number, numColumns: number) => (position: Position) =>
     position.row >= 0 &&

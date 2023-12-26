@@ -5,6 +5,7 @@ import {
 } from "../../common/location/Vector.ts";
 
 export interface Brick {
+  name?: string;
   start: Vector;
   end: Vector;
 }
@@ -15,7 +16,8 @@ export const parseInput = (input: string): Array<Brick> =>
     .split("\n")
     .filter((p) => p)
     .map((p) => p.trim())
-    .map((r) => parseRow(r));
+    .map((r) => parseRow(r))
+    .map((r, i) => ({ ...r, name: "ABCDEFGHIJKLMNOPQ".charAt(i) }));
 
 export const parseRow = (input: string): Brick => {
   const [s, e] = input.split("~");
